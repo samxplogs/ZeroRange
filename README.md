@@ -200,7 +200,10 @@ Contributions welcome! Please:
 
 ## Credits
 
-Created by [@samxplogs](https://github.com/samxplogs)
+Created by **samxplogs**
+
+- GitHub: [@samxplogs](https://github.com/samxplogs)
+- YouTube: [@samxplogs](https://youtube.com/@samxplogs)
 
 Built for the Flipper Zero community.
 
