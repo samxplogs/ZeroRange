@@ -23,7 +23,7 @@
 ```
 ┌────────────────────────────────────┐
 │  ╔════════════════════════════╗    │
-│  ║ >iButton          25/90   ║    │
+│  ║ >iButton         25/120   ║    │
 │  ║ U/D SEL=Go L=Bk           ║    │
 │  ╚════════════════════════════╝    │
 │                                    │
@@ -49,13 +49,15 @@ Navigate through challenges using the 5-button interface:
 | **iButton** | Touch & Read, Clone, Emulate | 30 pts | Available |
 | **NFC** | Detect, Clone, MIFARE Attack | 30 pts | Available |
 | **RFID** | Detect, Clone, Simulate | 30 pts | Available |
+| **SubGHZ** | Detect Signal, Record & Replay, Signal Analysis | 30 pts | Available |
+
+**Total: 120 points** across 12 challenges
 
 ### Coming Soon
 
 | Module | Description | Status |
 |--------|-------------|--------|
 | **IR** | Infrared signal challenges | In Development |
-| **Sub-GHz** | Radio frequency challenges | Planned |
 
 ---
 
@@ -71,7 +73,8 @@ GPIO 3 (SCL)  ─────────────►
 GPIO 5        ─────────────► iButton Probe (1-Wire)
               ├── 4.7kΩ ──► 3.3V (Pull-up)
 
-USB           ─────────────► Proxmark3 (NFC/RFID)
+USB Port 1    ─────────────► Proxmark3 (NFC/RFID)
+USB Port 2    ─────────────► HackRF One (SubGHZ)
 ```
 
 **Components:**
@@ -79,6 +82,7 @@ USB           ─────────────► Proxmark3 (NFC/RFID)
 - Adafruit RGB LCD Shield 16x2
 - iButton Probe DS9092
 - Proxmark3 (for NFC/RFID challenges)
+- HackRF One (for SubGHZ challenges)
 - Flipper Zero (your training tool)
 
 ---
@@ -139,6 +143,24 @@ For detailed installation instructions, see [INSTALLATION.md](INSTALLATION.md).
 ╚════════════════════════════╝
 ```
 
+### SubGHZ - Record & Replay
+```
+╔════════════════════════════╗
+║ SubGHz Ch2 [1/2]          ║
+║ Press TX button           ║
+╚════════════════════════════╝
+         ↓
+╔════════════════════════════╗
+║ Signal captured!          ║
+║ Strength: -45dBm          ║
+╚════════════════════════════╝
+         ↓
+╔════════════════════════════╗
+║ SOLVED! +10pts            ║
+║ Signal replayed!          ║
+╚════════════════════════════╝
+```
+
 ---
 
 ## Features
@@ -157,12 +179,17 @@ For detailed installation instructions, see [INSTALLATION.md](INSTALLATION.md).
 ZeroRange/
 ├── zerorange.py          # Main application
 ├── lcd_manager.py        # LCD display control
+├── database.py           # Score persistence
+├── config.json           # Configuration
+│
 ├── ibutton_handler.py    # iButton challenge logic
 ├── nfc_handler.py        # NFC challenges (Proxmark3)
 ├── rfid_handler.py       # RFID challenges (Proxmark3)
 ├── proxmark_handler.py   # Proxmark3 interface
-├── database.py           # Score persistence
-├── config.json           # Configuration
+├── subghz_handler.py     # SubGHZ challenges (HackRF)
+├── hackrf_handler.py     # HackRF One interface
+│
+├── SUBGHZ_INTEGRATION.md # SubGHZ setup guide
 └── docs/                 # Web documentation
 ```
 
