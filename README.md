@@ -70,17 +70,15 @@ GPIO 2 (SDA)  ─────────────► Adafruit LCD (I2C)
 GPIO 3 (SCL)  ─────────────►
 5V / GND      ─────────────►
 
-GPIO 5        ─────────────► iButton Probe (1-Wire)
-              ├── 4.7kΩ ──► 3.3V (Pull-up)
-
-USB Port 1    ─────────────► Proxmark3 (NFC/RFID)
-USB Port 2    ─────────────► HackRF One (SubGHZ)
+USB Port 1    ─────────────► iButton USB Reader (HID)
+USB Port 2    ─────────────► Proxmark3 (NFC/RFID)
+USB Port 3    ─────────────► HackRF One (SubGHZ)
 ```
 
 **Components:**
 - Raspberry Pi 5 (or Pi 4)
 - Adafruit RGB LCD Shield 16x2
-- iButton Probe DS9092
+- iButton USB Reader (HID keyboard emulation)
 - Proxmark3 (for NFC/RFID challenges)
 - HackRF One (for SubGHZ challenges)
 - Flipper Zero (your training tool)
