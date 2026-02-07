@@ -18,7 +18,7 @@
 
 ---
 
-## LCD Interface Preview
+## 📟 LCD Interface Preview
 
 ```
 ┌────────────────────────────────────┐
@@ -94,6 +94,8 @@ USB Port 3    ─────────────► HackRF One (SubGHZ)
 | **Raspberry Pi 5 (4GB)** | [Buy on Amazon](https://amzn.to/3O4jeX1) | — |
 | **Adafruit i2c 16x2 RGB LCD Pi Plate** | [Buy on Amazon](https://amzn.to/4rGhYrK) | — |
 | **Proxmark3** | [Buy on Amazon](https://amzn.to/4akFmDZ) | [Buy on AliExpress](https://s.click.aliexpress.com/e/_c3znHpUL) |
+| **HackRF One** | [Buy on Amazon](https://amzn.to/4ttmuvs) | — |
+| **HackRF + Porta Pack** | — | [Buy on AliExpress](https://s.click.aliexpress.com/e/_c3vH9LoF) |
 | **iButton USB Reader** | — | [Buy on AliExpress](https://s.click.aliexpress.com/e/_c3KQ9ToL) |
 
 ---
