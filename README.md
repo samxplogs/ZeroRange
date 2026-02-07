@@ -85,6 +85,19 @@ USB Port 3    ─────────────► HackRF One (SubGHZ)
 
 ---
 
+## 🛒 Shopping List
+
+> **Affiliate Disclaimer:** As an Amazon and AliExpress Associate, I earn from qualifying purchases. You will pay the same price, but I might earn a small commission — this helps finance the gear and support the development of ZeroRange. Thank you!
+
+| Component | Amazon | AliExpress |
+|-----------|--------|------------|
+| **Raspberry Pi 5 (4GB)** | [Buy on Amazon](https://amzn.to/3O4jeX1) | — |
+| **Adafruit i2c 16x2 RGB LCD Pi Plate** | [Buy on Amazon](https://amzn.to/4rGhYrK) | — |
+| **Proxmark3** | [Buy on Amazon](https://amzn.to/4akFmDZ) | [Buy on AliExpress](https://s.click.aliexpress.com/e/_c3znHpUL) |
+| **iButton USB Reader** | — | [Buy on AliExpress](https://s.click.aliexpress.com/e/_c3KQ9ToL) |
+
+---
+
 ## Quick Start
 
 ```bash
