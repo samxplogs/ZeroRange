@@ -16,6 +16,10 @@
   Built on Raspberry Pi with an interactive LCD interface.
 </p>
 
+<p align="center">
+  <img src="Gemini_Generated_Image_57n5cv57n5cv57n5.png" alt="ZeroRange" width="600"/>
+</p>
+
 ---
 
 ## 📟 LCD Interface Preview
