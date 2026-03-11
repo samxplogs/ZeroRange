@@ -1,0 +1,94 @@
+{
+  "$schema": "./schema.json",
+  "module": "ir",
+  "version": "1.0",
+  "description": "Challenges for Infrared signal training with FLIRC USB receiver",
+  "challenges": [
+    {
+      "id": "ir_detect",
+      "name": "Detect IR Signal",
+      "description": "Receive any IR signal from a remote control or Flipper Zero",
+      "difficulty": "beginner",
+      "points": 10,
+      "timeout_seconds": 60,
+      "type": "detect",
+      "instructions": [
+        "Navigate to Infrared > Universal Remote on your Flipper Zero",
+        "Or use any IR remote control",
+        "Point it at the FLIRC USB receiver",
+        "Press any button to send an IR signal"
+      ],
+      "success_message": "IR signal detected! Key: {keycode} Protocol: {protocol}",
+      "failure_message": "No IR signal detected",
+      "validation": {
+        "method": "any_detection",
+        "parameters": {
+          "min_events": 1
+        }
+      },
+      "hints": [
+        "Point the remote directly at the FLIRC receiver",
+        "Make sure there are no obstructions between remote and receiver",
+        "Try a TV or AC remote if Flipper Zero is not available"
+      ]
+    },
+    {
+      "id": "ir_replay",
+      "name": "Capture & Replay",
+      "description": "Record an IR signal and replay the exact same signal",
+      "difficulty": "intermediate",
+      "points": 10,
+      "timeout_seconds": 90,
+      "type": "multi_step",
+      "instructions": [
+        "Step 1: Send an IR signal (any button) to be recorded",
+        "Step 2: The system memorizes the signal",
+        "Step 3: Send the EXACT same signal again",
+        "The system verifies both signals match"
+      ],
+      "success_message": "Signals match! Successfully replayed {keycode}",
+      "failure_message": "Signals do not match - try sending the same button",
+      "validation": {
+        "method": "clone_verify",
+        "parameters": {
+          "match_keycode": true,
+          "match_scancode": true
+        }
+      },
+      "hints": [
+        "Use the same remote and same button both times",
+        "On Flipper Zero: Infrared > Learn > save, then replay",
+        "Keep consistent distance and angle"
+      ]
+    },
+    {
+      "id": "ir_protocol",
+      "name": "Protocol Analysis",
+      "description": "Send multiple IR signals and identify the protocols used",
+      "difficulty": "advanced",
+      "points": 10,
+      "timeout_seconds": 120,
+      "type": "analysis",
+      "instructions": [
+        "Send 3 different IR signals to the receiver",
+        "The system identifies the IR protocol for each",
+        "Common protocols: NEC, RC5, RC6, Sony SIRC, Samsung",
+        "Try using different remotes or Flipper Zero protocols"
+      ],
+      "success_message": "Analysis complete! Detected protocols: {protocols}",
+      "failure_message": "Not enough signals received",
+      "validation": {
+        "method": "protocol_identification",
+        "parameters": {
+          "required_signals": 3,
+          "known_protocols": ["NEC", "RC5", "RC6", "SONY", "SAMSUNG", "RAW"]
+        }
+      },
+      "hints": [
+        "Most TV remotes use NEC protocol",
+        "Try Flipper Zero's IR > Universal Remote for different protocols",
+        "European remotes often use RC5 (Philips)"
+      ]
+    }
+  ]
+}

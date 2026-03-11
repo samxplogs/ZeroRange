@@ -1,0 +1,34 @@
+{
+  "$schema": "./schema.json",
+  "module": "MODULE_NAME",
+  "version": "1.0",
+  "description": "Description of this module's challenges",
+  "challenges": [
+    {
+      "id": "module_challenge_1",
+      "name": "Challenge Name",
+      "description": "Full description of the challenge objective",
+      "difficulty": "beginner",
+      "points": 10,
+      "timeout_seconds": 60,
+      "type": "detect",
+      "instructions": [
+        "Step 1: First instruction",
+        "Step 2: Second instruction",
+        "Step 3: Third instruction"
+      ],
+      "success_message": "Success! Result: {result}",
+      "failure_message": "Failed - try again",
+      "validation": {
+        "method": "any_detection",
+        "parameters": {}
+      },
+      "hints": [
+        "Helpful hint 1",
+        "Helpful hint 2"
+      ],
+      "prerequisites": [],
+      "enabled": true
+    }
+  ]
+}

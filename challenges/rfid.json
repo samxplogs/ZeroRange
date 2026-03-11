@@ -1,0 +1,89 @@
+{
+  "$schema": "./schema.json",
+  "module": "rfid",
+  "version": "1.0",
+  "description": "Challenges for RFID 125kHz protocol training",
+  "challenges": [
+    {
+      "id": "rfid_detect",
+      "name": "Detect Tag",
+      "description": "Detect and read a 125kHz RFID tag",
+      "difficulty": "beginner",
+      "points": 10,
+      "timeout_seconds": 45,
+      "type": "detect",
+      "instructions": [
+        "Navigate to RFID > Read on your Flipper Zero",
+        "Place a 125kHz tag near the Proxmark antenna",
+        "The system will verify your read"
+      ],
+      "success_message": "RFID tag detected! ID: {tag_id} Protocol: {protocol}",
+      "failure_message": "Timeout - No RFID tag detected",
+      "validation": {
+        "method": "any_detection",
+        "parameters": {
+          "accepted_protocols": ["EM4100", "HID", "Indala", "AWID", "FDX-B"]
+        }
+      },
+      "hints": [
+        "125kHz tags need to be very close to the reader",
+        "Try rotating the tag if not detected"
+      ]
+    },
+    {
+      "id": "rfid_clone_t5577",
+      "name": "Clone to T5577",
+      "description": "Clone an EM4100 tag to a writable T5577 card",
+      "difficulty": "intermediate",
+      "points": 10,
+      "timeout_seconds": 60,
+      "type": "multi_step",
+      "instructions": [
+        "Step 1: Read the target EM4100 tag",
+        "Step 2: Write the ID to a T5577 card",
+        "Step 3: Present the cloned card for verification"
+      ],
+      "success_message": "T5577 clone successful! ID verified",
+      "failure_message": "Clone failed - IDs don't match",
+      "validation": {
+        "method": "clone_verify",
+        "parameters": {
+          "source_protocol": "EM4100",
+          "target_card": "T5577",
+          "require_exact_match": true
+        }
+      },
+      "hints": [
+        "T5577 is a universal writable card",
+        "Make sure to select EM4100 emulation mode on T5577"
+      ]
+    },
+    {
+      "id": "rfid_simulate",
+      "name": "Simulate EM410x",
+      "description": "Use your Flipper to emulate an EM410x tag",
+      "difficulty": "intermediate",
+      "points": 10,
+      "timeout_seconds": 60,
+      "type": "emulation",
+      "instructions": [
+        "Read or manually add an EM410x tag to your Flipper",
+        "Navigate to RFID > Saved > [Your tag] > Emulate",
+        "Hold your Flipper near the reader while emulating"
+      ],
+      "success_message": "Emulation detected! ID: {emulated_id}",
+      "failure_message": "No emulation detected",
+      "validation": {
+        "method": "emulation_detect",
+        "parameters": {
+          "protocol": "EM410x",
+          "require_valid_id": true
+        }
+      },
+      "hints": [
+        "Flipper emulation range is limited - get very close",
+        "Keep the Flipper steady while emulating"
+      ]
+    }
+  ]
+}

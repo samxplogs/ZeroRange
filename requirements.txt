@@ -1,0 +1,8 @@
+# Python dependencies for ZeroRange
+# Install with: pip3 install -r requirements.txt
+
+# LCD dependencies (smbus2 for I2C communication)
+smbus2>=0.4.0
+
+# Note: HackRF tools are system packages, not Python packages
+# Install with: sudo apt install hackrf libhackrf-dev rtl-433

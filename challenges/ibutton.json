@@ -1,0 +1,93 @@
+{
+  "$schema": "./schema.json",
+  "module": "ibutton",
+  "version": "1.0",
+  "description": "Challenges for iButton/1-Wire protocol training",
+  "challenges": [
+    {
+      "id": "ibutton_detect",
+      "name": "Touch & Read",
+      "description": "Detect and read any iButton using your Flipper Zero",
+      "difficulty": "beginner",
+      "points": 10,
+      "timeout_seconds": 60,
+      "type": "detect",
+      "instructions": [
+        "Connect your Flipper Zero to the iButton probe",
+        "Navigate to 1-Wire > Read on your Flipper",
+        "Touch any iButton to the probe",
+        "The system will detect your read automatically"
+      ],
+      "success_message": "iButton detected! ID: {detected_id}",
+      "failure_message": "Timeout - No iButton detected",
+      "validation": {
+        "method": "any_detection",
+        "parameters": {}
+      },
+      "hints": [
+        "Make sure the iButton makes good contact with the probe",
+        "Hold the iButton steady for 1-2 seconds"
+      ]
+    },
+    {
+      "id": "ibutton_clone",
+      "name": "Clone iButton",
+      "description": "Read an iButton and then emulate it with your Flipper Zero",
+      "difficulty": "intermediate",
+      "points": 10,
+      "timeout_seconds": 90,
+      "type": "multi_step",
+      "instructions": [
+        "Step 1: Read the target iButton",
+        "Step 2: Save it on your Flipper Zero",
+        "Step 3: Emulate the saved iButton",
+        "Step 4: Touch the probe while emulating"
+      ],
+      "success_message": "Clone successful! Original: {original_id} - Clone verified!",
+      "failure_message": "Clone verification failed",
+      "validation": {
+        "method": "clone_verify",
+        "parameters": {
+          "require_original_read": true,
+          "require_emulation_match": true
+        }
+      },
+      "hints": [
+        "First read the original iButton to get its ID",
+        "Make sure emulation mode is active when touching the probe"
+      ]
+    },
+    {
+      "id": "ibutton_emulate_target",
+      "name": "Emulate Specific ID",
+      "description": "Program your Flipper Zero to emulate a specific iButton ID",
+      "difficulty": "intermediate",
+      "points": 10,
+      "timeout_seconds": 120,
+      "type": "target_match",
+      "instructions": [
+        "Program the target ID shown on screen into your Flipper",
+        "Navigate to 1-Wire > Saved > Add Manually",
+        "Enter the exact ID displayed",
+        "Emulate and touch the probe to verify"
+      ],
+      "success_message": "Target ID matched! Challenge complete!",
+      "failure_message": "ID mismatch - Try again",
+      "validation": {
+        "method": "exact_match",
+        "parameters": {
+          "target_ids": [
+            "01:23:45:67:89:AB:CD:EF",
+            "DE:AD:BE:EF:CA:FE:BA:BE",
+            "AA:BB:CC:DD:EE:FF:00:11"
+          ],
+          "random_selection": true
+        }
+      },
+      "hints": [
+        "Check byte order - Flipper may display LSB first",
+        "Double-check each byte before emulating"
+      ]
+    }
+  ]
+}

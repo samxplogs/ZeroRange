@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://zerorange.local/challenge-schema.json",
+  "title": "ZeroRange Challenge Configuration",
+  "description": "Schema for ZeroRange module challenge configuration files",
+  "type": "object",
+  "required": ["module", "version", "challenges"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Reference to this schema file"
+    },
+    "module": {
+      "type": "string",
+      "enum": ["ibutton", "nfc", "rfid", "subghz", "ir"],
+      "description": "Module identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$",
+      "description": "Configuration version (semver major.minor)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description of this module's challenges"
+    },
+    "challenges": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/challenge"
+      }
+    }
+  },
+  "$defs": {
+    "challenge": {
+      "type": "object",
+      "required": ["id", "name", "description", "difficulty", "points", "timeout_seconds", "type", "instructions", "validation"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "description": "Unique identifier for this challenge (lowercase, underscores)"
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 20,
+          "description": "Short display name (max 20 chars for LCD)"
+        },
+        "description": {
+          "type": "string",
+          "description": "Full description of the challenge objective"
+        },
+        "difficulty": {
+          "type": "string",
+          "enum": ["beginner", "intermediate", "advanced", "expert"],
+          "description": "Challenge difficulty level"
+        },
+        "points": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "description": "Points awarded for completion"
+        },
+        "timeout_seconds": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 600,
+          "description": "Time limit in seconds"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["detect", "multi_step", "target_match", "attack", "emulation", "capture", "analysis"],
+          "description": "Challenge type determining validation logic"
+        },
+        "instructions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          },
+          "description": "Step-by-step instructions for the user"
+        },
+        "success_message": {
+          "type": "string",
+          "description": "Message shown on success (supports {placeholders})"
+        },
+        "failure_message": {
+          "type": "string",
+          "description": "Message shown on failure"
+        },
+        "validation": {
+          "$ref": "#/$defs/validation"
+        },
+        "hints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional hints to help the user"
+        },
+        "prerequisites": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Challenge IDs that must be completed first"
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether this challenge is active"
+        },
+        "custom_data": {
+          "type": "object",
+          "description": "Module-specific custom configuration"
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "required": ["method"],
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": [
+            "any_detection",
+            "exact_match",
+            "clone_verify",
+            "key_recovery",
+            "emulation_detect",
+            "signal_capture",
+            "replay_count",
+            "protocol_identification"
+          ],
+          "description": "Validation method to use"
+        },
+        "parameters": {
+          "type": "object",
+          "description": "Method-specific parameters"
+        }
+      }
+    }
+  }
+}

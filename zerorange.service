@@ -1,0 +1,25 @@
+[Unit]
+Description=ZeroRange - Flipper Zero Training System
+Documentation=https://github.com/samxplogs/ZeroRange
+After=network.target
+
+[Service]
+Type=simple
+User=sam
+Group=sam
+WorkingDirectory=/home/sam/ZeroRange
+ExecStart=/bin/bash /home/sam/ZeroRange/start_all.sh
+ExecStop=/bin/bash /home/sam/ZeroRange/stop_all.sh
+Restart=on-failure
+RestartSec=30
+StartLimitIntervalSec=300
+StartLimitBurst=3
+
+Environment="PYTHONUNBUFFERED=1"
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=zerorange
+
+[Install]
+WantedBy=multi-user.target

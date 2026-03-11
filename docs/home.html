@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZeroRange - Flipper Zero Training System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        /* Navigation Menu */
+        nav.top-menu {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        nav.top-menu ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        nav.top-menu ul li {
+            margin: 0;
+        }
+
+        nav.top-menu ul li a,
+        nav.top-menu ul li button {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 20px 30px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        nav.top-menu ul li a:hover,
+        nav.top-menu ul li button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-bottom-color: white;
+        }
+
+        nav.top-menu ul li a.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-bottom-color: white;
+        }
+
+        .lang-toggle {
+            margin-left: auto;
+            letter-spacing: 1px;
+        }
+
+        .lang-toggle .lang-active {
+            text-decoration: underline;
+            text-underline-offset: 4px;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 1.3em;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+            opacity: 0.95;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 450px;
+            gap: 40px;
+            padding: 60px 40px;
+            align-items: start;
+        }
+
+        .intro-section h2 {
+            color: #667eea;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+        }
+
+        .intro-section p {
+            font-size: 1.1em;
+            line-height: 1.8;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .feature-card h3 {
+            color: #667eea;
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        /* LCD Container */
+        .lcd-container {
+            position: sticky;
+            top: 100px;
+        }
+
+        .lcd-screen {
+            background: #2d5016;
+            border: 15px solid #1a1a1a;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow:
+                inset 0 0 20px rgba(0,0,0,0.5),
+                0 10px 30px rgba(0,0,0,0.3);
+            font-family: 'Courier New', monospace;
+            font-size: 24px;
+            font-weight: bold;
+            color: #c5f776;
+            text-shadow: 0 0 8px rgba(197, 247, 118, 0.8);
+            line-height: 1.5;
+            letter-spacing: 2px;
+        }
+
+        .lcd-line {
+            display: block;
+            min-height: 1.5em;
+            white-space: pre;
+        }
+
+        .lcd-status {
+            text-align: center;
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 5px;
+            font-size: 14px;
+            color: #c5f776;
+        }
+
+        .lcd-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .lcd-button {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .lcd-button:hover {
+            background: #555;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+        }
+
+        .lcd-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .lcd-button.up { grid-column: 2; }
+        .lcd-button.left { grid-column: 1; grid-row: 2; }
+        .lcd-button.select { grid-column: 2; grid-row: 2; background: #667eea; }
+        .lcd-button.right { grid-column: 3; grid-row: 2; }
+        .lcd-button.down { grid-column: 2; grid-row: 3; }
+
+        /* CTA Section */
+        .cta-section {
+            background: #f8f9fa;
+            padding: 50px 40px;
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .lcd-container {
+                position: relative;
+                top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation Menu -->
+    <nav class="top-menu">
+        <ul>
+            <li><a href="home.html" class="active">🏠 <span data-fr="Accueil" data-en="Home">Accueil</span></a></li>
+            <li><a href="documentation.html">📖 Documentation</a></li>
+            <li><a href="contact.html">✉️ Contact</a></li>
+            <li class="lang-toggle">
+                <button onclick="toggleLang()">
+                    <span id="lang-label">🌐 FR | EN</span>
+                </button>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1>🎯 ZeroRange</h1>
+            <p data-fr="Pratiquer. Maitriser. Recommencer." data-en="Practice. Master. Repeat.">Pratiquer. Maitriser. Recommencer.</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Intro Section -->
+            <div class="intro-section">
+                <h2 data-fr="Systeme d'entrainement Flipper Zero" data-en="Flipper Zero Training System">Systeme d'entrainement Flipper Zero</h2>
+                <p data-fr="<strong>ZeroRange</strong> est une plateforme d'entrainement interactive concue pour maitriser votre Flipper Zero. A travers une serie de defis pratiques et progressifs, developpez vos competences en iButton, NFC, RFID et infrarouge dans un environnement controle et legal."
+                   data-en="<strong>ZeroRange</strong> is an interactive training platform designed to help you master your Flipper Zero. Through a series of practical, progressive challenges, develop your skills in iButton, NFC, RFID and infrared in a controlled and legal environment.">
+                    <strong>ZeroRange</strong> est une plateforme d'entrainement interactive concue pour maitriser
+                    votre Flipper Zero. A travers une serie de defis pratiques et progressifs, developpez vos
+                    competences en iButton, NFC, RFID et infrarouge dans un environnement controle et legal.
+                </p>
+                <p data-fr="Chaque module propose des challenges de difficulte croissante, vous permettant d'apprendre par la pratique. Accumulez des points, suivez vos progres et devenez un expert des technologies sans-fil et de controle d'acces."
+                   data-en="Each module offers increasingly difficult challenges, allowing you to learn by doing. Earn points, track your progress and become an expert in wireless technologies and access control.">
+                    Chaque module propose des challenges de difficulte croissante, vous permettant d'apprendre
+                    par la pratique. Accumulez des points, suivez vos progres et devenez un expert des technologies
+                    sans-fil et de controle d'acces.
+                </p>
+
+                <!-- Features Grid -->
+                <div class="features">
+                    <div class="feature-card">
+                        <h3>🔑 iButton</h3>
+                        <p data-fr="3 defis pour maitriser la lecture, le clonage et l'emulation de cles Dallas 1-Wire"
+                           data-en="3 challenges to master reading, cloning and emulating Dallas 1-Wire keys">3 defis pour maitriser la lecture, le clonage et l'emulation de cles Dallas 1-Wire</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>📡 NFC</h3>
+                        <p data-fr="Detecter, cloner et attaquer des cartes MIFARE Classic, NTAG et ISO14443A via Proxmark3"
+                           data-en="Detect, clone and attack MIFARE Classic, NTAG and ISO14443A cards via Proxmark3">Detecter, cloner et attaquer des cartes MIFARE Classic, NTAG et ISO14443A via Proxmark3</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>📻 RFID 125kHz</h3>
+                        <p data-fr="Lire, cloner sur T5577 et simuler des tags EM4100/HID via Proxmark3"
+                           data-en="Read, clone to T5577 and simulate EM4100/HID tags via Proxmark3">Lire, cloner sur T5577 et simuler des tags EM4100/HID via Proxmark3</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>📶 SubGHz</h3>
+                        <p data-fr="Capturer, rejouer et analyser des signaux RF 433MHz avec HackRF One SDR"
+                           data-en="Capture, replay and analyze 433MHz RF signals with HackRF One SDR">Capturer, rejouer et analyser des signaux RF 433MHz avec HackRF One SDR</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🔴 Infrared</h3>
+                        <p data-fr="Detecter, rejouer et identifier les protocoles de telecommande IR via FLIRC USB"
+                           data-en="Detect, replay and identify IR remote protocols via FLIRC USB">Detecter, rejouer et identifier les protocoles de telecommande IR via FLIRC USB</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live LCD Simulator -->
+            <div class="lcd-container">
+                <div class="lcd-screen">
+                    <span class="lcd-line" id="lcd-line1">&gt;iButton   0/150</span>
+                    <span class="lcd-line" id="lcd-line2">U/D SEL=Go L=Bk </span>
+                </div>
+                <div class="lcd-status">
+                    <strong>🟢 LIVE</strong> - <span data-fr="Simulation en temps reel" data-en="Real-time simulation">Simulation en temps reel</span>
+                </div>
+                <div class="lcd-buttons">
+                    <button class="lcd-button up" onclick="pressButton('up')">▲ UP</button>
+                    <button class="lcd-button left" onclick="pressButton('left')">◄ LEFT</button>
+                    <button class="lcd-button select" onclick="pressButton('select')">● SELECT</button>
+                    <button class="lcd-button right" onclick="pressButton('right')">► RIGHT</button>
+                    <button class="lcd-button down" onclick="pressButton('down')">▼ DOWN</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="cta-section">
+            <h2 data-fr="Pret a commencer?" data-en="Ready to get started?">Pret a commencer?</h2>
+            <p style="margin-bottom: 30px; color: #666;" data-fr="Consultez la documentation complete pour demarrer votre entrainement" data-en="Check out the full documentation to begin your training">Consultez la documentation complete pour demarrer votre entrainement</p>
+            <a href="documentation.html" class="cta-button" data-fr="Voir la documentation →" data-en="View documentation →">Voir la documentation →</a>
+        </div>
+    </div>
+
+    <script>
+        // API URL - uses same host, port 5000
+        const API_URL = `http://${window.location.hostname}:5000`;
+
+        // Language toggle
+        let currentLang = localStorage.getItem('zerorange-lang') || 'fr';
+
+        function applyLang(lang) {
+            currentLang = lang;
+            localStorage.setItem('zerorange-lang', lang);
+            document.documentElement.lang = lang;
+
+            document.querySelectorAll('[data-fr][data-en]').forEach(el => {
+                const text = el.getAttribute('data-' + lang);
+                if (el.tagName === 'A' || el.tagName === 'P' || el.tagName === 'H2' || el.tagName === 'SPAN') {
+                    el.innerHTML = text;
+                } else {
+                    el.textContent = text;
+                }
+            });
+
+            const label = document.getElementById('lang-label');
+            if (lang === 'fr') {
+                label.innerHTML = '🌐 <span class="lang-active">FR</span> | EN';
+            } else {
+                label.innerHTML = '🌐 FR | <span class="lang-active">EN</span>';
+            }
+        }
+
+        function toggleLang() {
+            applyLang(currentLang === 'fr' ? 'en' : 'fr');
+        }
+
+        // Apply saved language on load
+        applyLang(currentLang);
+
+        function updateDisplayFromState(state) {
+            document.getElementById('lcd-line1').textContent = state.line1;
+            document.getElementById('lcd-line2').textContent = state.line2;
+        }
+
+        async function pressButton(button) {
+            try {
+                const response = await fetch(`${API_URL}/api/lcd/button`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ button: button })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.state) {
+                        updateDisplayFromState(data.state);
+                    }
+                }
+            } catch (error) {
+                console.error('API error:', error);
+            }
+        }
+
+        async function fetchState() {
+            try {
+                const response = await fetch(`${API_URL}/api/lcd/state`);
+                if (response.ok) {
+                    const state = await response.json();
+                    updateDisplayFromState(state);
+                }
+            } catch (error) {
+                console.error('API error:', error);
+            }
+        }
+
+        // Load initial state from API
+        fetchState();
+    </script>
+</body>
+</html>

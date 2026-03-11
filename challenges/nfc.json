@@ -1,0 +1,90 @@
+{
+  "$schema": "./schema.json",
+  "module": "nfc",
+  "version": "1.0",
+  "description": "Challenges for NFC/ISO14443A protocol training",
+  "challenges": [
+    {
+      "id": "nfc_detect",
+      "name": "Detect & Read",
+      "description": "Detect an NFC card and read its UID",
+      "difficulty": "beginner",
+      "points": 10,
+      "timeout_seconds": 45,
+      "type": "detect",
+      "instructions": [
+        "Navigate to NFC > Read on your Flipper Zero",
+        "Place an NFC card on the Proxmark reader",
+        "The system will verify your successful read"
+      ],
+      "success_message": "NFC card detected! UID: {detected_uid} Type: {card_type}",
+      "failure_message": "Timeout - No NFC card detected",
+      "validation": {
+        "method": "any_detection",
+        "parameters": {
+          "accepted_types": ["ISO14443A", "ISO14443B", "MIFARE Classic", "MIFARE Ultralight"]
+        }
+      },
+      "hints": [
+        "Keep the card flat on the reader",
+        "Try different card orientations if not detected"
+      ]
+    },
+    {
+      "id": "nfc_clone",
+      "name": "Clone Card",
+      "description": "Read an NFC card's UID and clone it to a magic card",
+      "difficulty": "intermediate",
+      "points": 10,
+      "timeout_seconds": 60,
+      "type": "multi_step",
+      "instructions": [
+        "Step 1: Read the target NFC card UID",
+        "Step 2: Write the UID to a magic card (Gen1a/Gen2)",
+        "Step 3: Present the cloned card for verification"
+      ],
+      "success_message": "Clone verified! UID match confirmed",
+      "failure_message": "Clone verification failed - UIDs don't match",
+      "validation": {
+        "method": "clone_verify",
+        "parameters": {
+          "require_original_read": true,
+          "require_clone_match": true,
+          "magic_card_types": ["Gen1a", "Gen2", "CUID"]
+        }
+      },
+      "hints": [
+        "Use a Gen1a magic card for best compatibility",
+        "Make sure to write the complete UID"
+      ]
+    },
+    {
+      "id": "nfc_mifare_attack",
+      "name": "MIFARE Attack",
+      "description": "Perform a nested attack to recover MIFARE Classic keys",
+      "difficulty": "advanced",
+      "points": 10,
+      "timeout_seconds": 120,
+      "type": "attack",
+      "instructions": [
+        "Place a MIFARE Classic card on the reader",
+        "Use Flipper or Proxmark to perform nested attack",
+        "Recover at least one sector key",
+        "The system will verify key recovery"
+      ],
+      "success_message": "Attack successful! Keys recovered for sector {sector}",
+      "failure_message": "Attack failed - No keys recovered",
+      "validation": {
+        "method": "key_recovery",
+        "parameters": {
+          "min_keys_required": 1,
+          "accepted_methods": ["nested", "hardnested", "darkside"]
+        }
+      },
+      "hints": [
+        "Start with default keys (FFFFFFFFFFFF, A0A1A2A3A4A5)",
+        "Nested attack requires at least one known key"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "version": "1.0",
+  "modules": {
+    "ibutton": {
+      "enabled": true,
+      "challenges": [
+        {
+          "id": 1,
+          "name": "Touch & Read",
+          "description": "Detect any iButton",
+          "points": 10,
+          "timeout": 60,
+          "difficulty": 1
+        },
+        {
+          "id": 2,
+          "name": "Clone iButton",
+          "description": "Read then emulate",
+          "points": 15,
+          "timeout": 90,
+          "difficulty": 2
+        },
+        {
+          "id": 3,
+          "name": "Emulate Specific",
+          "description": "Create custom ID",
+          "points": 15,
+          "timeout": 120,
+          "difficulty": 3
+        }
+      ]
+    },
+    "nfc": {
+      "enabled": false,
+      "note": "NFC challenges coming in Phase 2"
+    },
+    "rfid": {
+      "enabled": false,
+      "note": "RFID challenges coming in Phase 2"
+    }
+  },
+  "settings": {
+    "log_level": "INFO",
+    "auto_return_delay": 3,
+    "lcd_address": "0x20",
+    "i2c_bus": 1,
+    "w1_gpio": 5
+  },
+  "hardware": {
+    "lcd": {
+      "type": "Adafruit I2C LCD 16x2",
+      "width": 16,
+      "height": 2,
+      "i2c_address": "0x20",
+      "note": "Common addresses: 0x20, 0x27, or 0x3F depending on model"
+    },
+    "ibutton": {
+      "probe": "DS9092",
+      "gpio": 5,
+      "pullup_resistance": "4.7kΩ"
+    }
+  }
+}

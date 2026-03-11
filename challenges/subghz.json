@@ -1,0 +1,98 @@
+{
+  "$schema": "./schema.json",
+  "module": "subghz",
+  "version": "1.0",
+  "description": "Challenges for Sub-GHz RF signal training",
+  "challenges": [
+    {
+      "id": "subghz_capture",
+      "name": "Detect & Capture",
+      "description": "Capture an RF signal at 433.92MHz",
+      "difficulty": "beginner",
+      "points": 10,
+      "timeout_seconds": 60,
+      "type": "capture",
+      "instructions": [
+        "Navigate to Sub-GHz > Read on your Flipper Zero",
+        "Set frequency to 433.92 MHz",
+        "Transmit a signal near the HackRF antenna",
+        "The system will verify signal capture"
+      ],
+      "success_message": "Signal captured! Strength: {signal_strength} dBm",
+      "failure_message": "No signal detected above threshold",
+      "validation": {
+        "method": "signal_capture",
+        "parameters": {
+          "frequency_mhz": 433.92,
+          "min_signal_strength_dbm": -55,
+          "min_duration_ms": 100
+        }
+      },
+      "hints": [
+        "Get close to the HackRF antenna",
+        "Use a simple OOK remote for best results"
+      ]
+    },
+    {
+      "id": "subghz_replay",
+      "name": "Record & Replay",
+      "description": "Record an RF signal and replay it multiple times",
+      "difficulty": "intermediate",
+      "points": 10,
+      "timeout_seconds": 90,
+      "type": "multi_step",
+      "instructions": [
+        "Step 1: Record a signal using Sub-GHz > Read",
+        "Step 2: Save the captured signal",
+        "Step 3: Replay the signal 3 times",
+        "The system counts successful replays"
+      ],
+      "success_message": "Replay complete! {replay_count}/3 replays detected",
+      "failure_message": "Not enough replays detected",
+      "validation": {
+        "method": "replay_count",
+        "parameters": {
+          "required_replays": 3,
+          "max_time_between_replays_sec": 10,
+          "signal_similarity_threshold": 0.8
+        }
+      },
+      "hints": [
+        "Wait a second between each replay",
+        "Keep consistent distance from the antenna"
+      ]
+    },
+    {
+      "id": "subghz_analysis",
+      "name": "Signal Analysis",
+      "description": "Identify the protocol and modulation of a signal",
+      "difficulty": "advanced",
+      "points": 10,
+      "timeout_seconds": 120,
+      "type": "analysis",
+      "instructions": [
+        "A test signal will be transmitted",
+        "Capture and analyze the signal",
+        "Identify the modulation type (OOK/FSK/etc)",
+        "Submit your analysis via the interface"
+      ],
+      "success_message": "Correct analysis! Protocol: {protocol} Modulation: {modulation}",
+      "failure_message": "Analysis incorrect",
+      "validation": {
+        "method": "protocol_identification",
+        "parameters": {
+          "test_signals": [
+            {"protocol": "Princeton", "modulation": "OOK", "frequency": 433.92},
+            {"protocol": "CAME", "modulation": "OOK", "frequency": 433.92},
+            {"protocol": "Nice FLO", "modulation": "OOK", "frequency": 433.92}
+          ],
+          "random_selection": true
+        }
+      },
+      "hints": [
+        "Look at the signal pattern in the Flipper analyzer",
+        "Common protocols: Princeton, CAME, Nice FLO"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZeroRange - Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto 20px auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .lang-switcher {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            display: flex;
+            gap: 10px;
+            background: rgba(255,255,255,0.2);
+            padding: 8px;
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .lang-btn {
+            background: transparent;
+            border: 2px solid rgba(255,255,255,0.5);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .lang-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        .lang-btn.active {
+            background: white;
+            color: #667eea;
+            border-color: white;
+        }
+
+        .content {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .lcd-container {
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+        }
+
+        .lcd-screen {
+            background: #2d5016;
+            border: 15px solid #1a1a1a;
+            border-radius: 10px;
+            padding: 0;
+            box-shadow:
+                inset 0 0 20px rgba(0,0,0,0.5),
+                0 10px 30px rgba(0,0,0,0.3);
+            font-family: 'Courier New', monospace;
+            font-size: 24px;
+            font-weight: bold;
+            color: #c5f776;
+            text-shadow: 0 0 8px rgba(197, 247, 118, 0.8);
+            line-height: 1.5;
+            letter-spacing: 2px;
+        }
+
+        .lcd-line {
+            display: block;
+            min-height: 1.5em;
+            white-space: pre;
+        }
+
+        .lcd-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .lcd-button {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .lcd-button:hover {
+            background: #555;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+        }
+
+        .lcd-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .lcd-button.up { grid-column: 2; }
+        .lcd-button.left { grid-column: 1; grid-row: 2; }
+        .lcd-button.select { grid-column: 2; grid-row: 2; background: #667eea; }
+        .lcd-button.right { grid-column: 3; grid-row: 2; }
+        .lcd-button.down { grid-column: 2; grid-row: 3; }
+
+        .documentation {
+            padding: 0;
+        }
+
+        nav {
+            background: #f5f5f5;
+            padding: 0;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        nav h3 {
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        nav ul {
+            list-style: none;
+        }
+
+        nav ul li {
+            margin: 8px 0;
+        }
+
+        nav ul li a {
+            color: #333;
+            text-decoration: none;
+            padding: 8px 12px;
+            display: block;
+            border-radius: 5px;
+            transition: all 0.2s;
+        }
+
+        nav ul li a:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        section {
+            margin-bottom: 50px;
+        }
+
+        h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin: 30px 0 15px 0;
+        }
+
+        h4 {
+            color: #555;
+            font-size: 1.2em;
+            margin: 20px 0 10px 0;
+        }
+
+        p {
+            line-height: 1.8;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        ul, ol {
+            margin: 15px 0 15px 30px;
+            line-height: 1.8;
+        }
+
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #e83e8c;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .warning-box {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .success-box {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .button-legend {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #333;
+            color: white;
+            border-radius: 4px;
+            font-weight: bold;
+            margin: 0 4px;
+        }
+
+        @media (max-width: 1024px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .lcd-container {
+                position: relative;
+                top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation Menu -->
+    <nav class="top-menu" style="background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(10px); padding: 0; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);">
+        <ul style="list-style: none; display: flex; justify-content: center; align-items: center; max-width: 1400px; margin: 0 auto 20px auto;">
+            <li style="margin: 0;"><a href="home.html" style="display: block; color: white; text-decoration: none; padding: 20px 30px; font-weight: 600; font-size: 16px; transition: all 0.3s; border-bottom: 3px solid transparent;">🏠 Home</a></li>
+            <li style="margin: 0;"><a href="documentation.html" class="active" style="display: block; color: white; text-decoration: none; padding: 20px 30px; font-weight: 600; font-size: 16px; transition: all 0.3s; border-bottom: 3px solid white; background: rgba(255, 255, 255, 0.2);">📖 Documentation</a></li>
+            <li style="margin: 0;"><a href="contact.html" style="display: block; color: white; text-decoration: none; padding: 20px 30px; font-weight: 600; font-size: 16px; transition: all 0.3s; border-bottom: 3px solid transparent;">✉️ Contact</a></li>
+        </ul>
+    </nav>
+
+
+    <div class="container">
+        <header>
+            <div class="lang-switcher">
+                <button class="lang-btn active" onclick="setLanguage('fr')">🇫🇷 FR</button>
+                <button class="lang-btn" onclick="setLanguage('en')">🇬🇧 EN</button>
+            </div>
+            <h1>🎯 ZeroRange</h1>
+            <p data-i18n="header.subtitle">Système d'entraînement Flipper Zero - Documentation complète</p>
+        </header>
+
+        <div class="content">
+            <!-- LCD Simulator -->
+            <div class="lcd-container">
+                <div class="lcd-screen">
+                    <span class="lcd-line" id="lcd-line1">&gt;iButton      0/40</span>
+                    <span class="lcd-line" id="lcd-line2">U/D SEL=Go L=Bk </span>
+                </div>
+                <div class="lcd-buttons">
+                    <button class="lcd-button up" onclick="pressButton('up')">▲ UP</button>
+                    <button class="lcd-button left" onclick="pressButton('left')">◄ LEFT</button>
+                    <button class="lcd-button select" onclick="pressButton('select')">● SELECT</button>
+                    <button class="lcd-button right" onclick="pressButton('right')">► RIGHT</button>
+                    <button class="lcd-button down" onclick="pressButton('down')">▼ DOWN</button>
+                </div>
+            </div>
+
+            <!-- Documentation -->
+            <div class="documentation">
+                <nav>
+                    <h3>📖 Table des matières</h3>
+                    <ul>
+                        <li><a href="#introduction">Introduction</a></li>
+                        <li><a href="#navigation">Navigation générale</a></li>
+                        <li><a href="#menu-principal">Menu principal</a></li>
+                        <li><a href="#ibutton">Module iButton</a></li>
+                        <li><a href="#nfc">Module NFC</a></li>
+                        <li><a href="#rfid">Module RFID</a></li>
+                        <li><a href="#ir">Module IR</a></li>
+                        <li><a href="#settings">Paramètres</a></li>
+                    </ul>
+                </nav>
+
+                <!-- Introduction -->
+                <section id="introduction">
+                    <h2>📱 Introduction</h2>
+                    <p>
+                        <strong>ZeroRange</strong> est un système d'entraînement interactif conçu pour maîtriser les fonctionnalités
+                        du Flipper Zero. Il propose une série de défis pratiques dans différents domaines : iButton, NFC, RFID et infrarouge.
+                    </p>
+
+                    <div class="info-box">
+                        <strong>🎯 Objectif :</strong> Accumuler des points en complétant des défis de difficulté croissante.
+                        Score maximum : <strong>40 points</strong>
+                    </div>
+
+                    <h3>Matériel requis</h3>
+                    <ul>
+                        <li>Raspberry Pi (testé sur Pi 5)</li>
+                        <li>Adafruit RGB LCD Shield 16x2 avec boutons</li>
+                        <li>Flipper Zero</li>
+                        <li>Interface iButton (GPIO 4)</li>
+                    </ul>
+                </section>
+
+                <!-- Navigation générale -->
+                <section id="navigation">
+                    <h2>🧭 Navigation générale</h2>
+
+                    <h3>Les boutons</h3>
+                    <p>Le système utilise 5 boutons pour la navigation :</p>
+
+                    <table>
+                        <tr>
+                            <th>Bouton</th>
+                            <th>Fonction</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td><span class="button-legend">▲ UP</span></td>
+                            <td>Naviguer vers le haut</td>
+                            <td>Permet de remonter dans une liste d'options ou de menu</td>
+                        </tr>
+                        <tr>
+                            <td><span class="button-legend">▼ DOWN</span></td>
+                            <td>Naviguer vers le bas</td>
+                            <td>Permet de descendre dans une liste d'options ou de menu</td>
+                        </tr>
+                        <tr>
+                            <td><span class="button-legend">● SELECT</span></td>
+                            <td>Sélectionner / Confirmer</td>
+                            <td>Valide le choix actuel ou entre dans un sous-menu</td>
+                        </tr>
+                        <tr>
+                            <td><span class="button-legend">◄ LEFT</span></td>
+                            <td>Retour</td>
+                            <td>Revient au menu précédent ou annule une action</td>
+                        </tr>
+                        <tr>
+                            <td><span class="button-legend">► RIGHT</span></td>
+                            <td>Réservé</td>
+                            <td>Fonction contextuelle selon le menu</td>
+                        </tr>
+                    </table>
+
+                    <h3>Comprendre l'affichage LCD</h3>
+                    <p>L'écran LCD 16x2 affiche les informations sur deux lignes de 16 caractères :</p>
+
+                    <h4>Format d'affichage standard</h4>
+                    <div class="lcd-screen" style="margin: 20px 0; max-width: 450px;">
+                        <span class="lcd-line">&gt;iButton      0/40</span>
+                        <span class="lcd-line">U/D SEL=Go L=Bk </span>
+                    </div>
+
+                    <ul>
+                        <li><code>&gt;</code> : Indicateur de sélection (pointe vers l'élément actif)</li>
+                        <li><code>iButton</code> : Nom du module ou de l'option sélectionnée</li>
+                        <li><code>0/40</code> : Score actuel / Score maximum</li>
+                        <li><code>U/D</code> : Up/Down - Utiliser les boutons haut/bas</li>
+                        <li><code>SEL=Go</code> : SELECT pour valider</li>
+                        <li><code>L=Bk</code> : LEFT pour retour (Back)</li>
+                    </ul>
+
+                    <h3>Principes de navigation</h3>
+                    <ol>
+                        <li><strong>Navigation cyclique</strong> : Appuyer sur DOWN depuis le dernier élément revient au premier (et vice-versa)</li>
+                        <li><strong>Validation immédiate</strong> : SELECT entre directement dans le menu ou lance l'action</li>
+                        <li><strong>Retour rapide</strong> : LEFT permet de revenir en arrière à tout moment</li>
+                        <li><strong>Indicateur visuel</strong> : Le symbole <code>&gt;</code> indique toujours l'élément actif</li>
+                    </ol>
+
+                    <div class="success-box">
+                        <strong>💡 Astuce :</strong> Les messages d'aide sur la ligne 2 sont contextuels et s'adaptent
+                        au menu actuel pour vous guider.
+                    </div>
+                </section>
+
+                <!-- Menu principal -->
+                <section id="menu-principal">
+                    <h2>🏠 Menu principal</h2>
+
+                    <p>Le menu principal est le point d'entrée du système. Il affiche tous les modules disponibles et votre score global.</p>
+
+                    <h3>Structure du menu</h3>
+                    <table>
+                        <tr>
+                            <th>Option</th>
+                            <th>État</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td>iButton</td>
+                            <td>✅ Disponible</td>
+                            <td>3 défis disponibles (10 points chacun)</td>
+                        </tr>
+                        <tr>
+                            <td>NFC</td>
+                            <td>🚧 À venir</td>
+                            <td>Défis NFC (bientôt disponible)</td>
+                        </tr>
+                        <tr>
+                            <td>RFID</td>
+                            <td>🚧 À venir</td>
+                            <td>Défis RFID 125kHz (bientôt disponible)</td>
+                        </tr>
+                        <tr>
+                            <td>IR</td>
+                            <td>🚧 À venir</td>
+                            <td>Défis infrarouge (bientôt disponible)</td>
+                        </tr>
+                        <tr>
+                            <td>Settings</td>
+                            <td>✅ Disponible</td>
+                            <td>Statistiques et réinitialisation</td>
+                        </tr>
+                    </table>
+
+                    <h3>Navigation dans le menu principal</h3>
+                    <div class="lcd-screen" style="margin: 20px 0; max-width: 450px;">
+                        <span class="lcd-line">&gt;iButton      0/40</span>
+                        <span class="lcd-line">U/D SEL=Go L=Bk </span>
+                    </div>
+
+                    <ol>
+                        <li>Utilisez <span class="button-legend">▲ UP</span> et <span class="button-legend">▼ DOWN</span> pour parcourir les options</li>
+                        <li>Le symbole <code>&gt;</code> indique l'option sélectionnée</li>
+                        <li>Appuyez sur <span class="button-legend">● SELECT</span> pour entrer dans le module</li>
+                    </ol>
+
+                    <h3>Exemples de navigation</h3>
+
+                    <h4>Sélection NFC</h4>
+                    <div class="lcd-screen" style="margin: 20px 0; max-width: 450px;">
+                        <span class="lcd-line">&gt;NFC          0/40</span>
+                        <span class="lcd-line">U/D SEL=Go L=Bk </span>
+                    </div>
+
+                    <h4>Sélection Settings</h4>
+                    <div class="lcd-screen" style="margin: 20px 0; max-width: 450px;">
+                        <span class="lcd-line">&gt;Settings     0/40</span>
+                        <span class="lcd-line">U/D SEL=Go L=Bk </span>
+                    </div>
+
+                    <div class="info-box">
+                        <strong>ℹ️ Note :</strong> Le score affiché en haut à droite (ex: <code>0/40</code>) représente
+                        votre progression globale. Il est mis à jour automatiquement après chaque défi réussi.
+                    </div>
+                </section>
+
+                <!-- Module iButton -->
+                <section id="ibutton">
+                    <h2>🔑 Module iButton</h2>
+
+                    <p>
+                        Le module iButton propose 3 défis de difficulté progressive pour maîtriser la lecture,
+                        le clonage et l'émulation de clés iButton (Dallas 1-Wire).
+                    </p>
+
+                    <h3>Menu iButton</h3>
+                    <div class="lcd-screen" style="margin: 20px 0; max-width: 450px;">
+                        <span class="lcd-line">iBtn Challenges </span>
+                        <span class="lcd-line">0/3 SEL=Go L=Bk </span>
+                    </div>
+
+                    <p>
+                        L'affichage montre le nombre de défis complétés (<code>0/3</code>). Appuyez sur
+                        <span class="button-legend">● SELECT</span> pour lancer un défi.
+                    </p>
+
+                    <h3>Défi 1 : Touch & Read (10 points)</h3>
+
+                    <h4>Objectif</h4>
+                    <p>Apprendre à lire une clé iButton avec le Flipper Zero</p>
+
+                    <h4>Déroulement</h4>
+                    <div class="lcd-screen" style="margin: 20px 0; max-width: 450px;">
+                        <span class="lcd-line">Challenge 1     </span>
+                        <span class="lcd-line">Touch & Read    </span>
+                    </div>
+
+                    <ol>
+                        <li>Le système affiche le défi pendant 3 secondes</li>
+                        <li>L'écran passe en mode attente :
+                            <div class="lcd-screen" style="margin: 10px 0; max-width: 450px;">
+                                <span class="lcd-line">Waiting for key.</span>
+                                <span class="lcd-line">Touch to reader.</span>
+                            </div>
+                        </li>
+                        <li>Touchez la clé iButton au lecteur connecté au Raspberry Pi</li>
+                        <li>Le système détecte la clé et affiche son ID (ex: <code>01 23 45 67 89 AB CD EF</code>)</li>
+                        <li>L'écran affiche les instructions Flipper :
+                            <div class="lcd-screen" style="margin: 10px 0; max-width: 450px;">
+                                <span class="lcd-line">Flipper: iBtn   </span>
+                                <span class="lcd-line">Read -> Save    </span>
+                            </div>
+                        </li>
+                        <li>Sur votre Flipper Zero :
+                            <ul>
+                                <li>Allez dans <strong>iButton</strong></li>
+                                <li>Sélectionnez <strong>Read</strong></li>
+                                <li>Touchez la clé au lecteur du Flipper</li>
+                                <li>Appuyez sur <strong>Save</strong></li>
+                            </ul>
+                        </li>
+                        <li>Retouchez la clé au lecteur du Raspberry Pi pour valider</li>
+                    </ol>
+
+                    <h4>Validation</h4>
+                    <div class="success-box">
+                        <strong>✅ Succès :</strong>
+                        <div class="lcd-screen" style="margin: 10px 0; max-width: 450px;">
+                            <span class="lcd-line">SUCCESS! +10pts </span>
+                            <span class="lcd-line">Challenge Done! </span>
+                        </div>
+                    </div>
+
+                    <div class="warning-box">
+                        <strong>⏱️ Timeout :</strong> Si aucune clé n'est détectée pendant 30 secondes,
+                        le défi échoue et vous revenez au menu.
+                    </div>
+
+                    <h3>Défi 2 : Clone Master (10 points)</h3>
+
+                    <h4>Objectif</h4>
+                    <p>Apprendre à cloner une clé iButton sur une clé vierge</p>
+
+                    <h4>Déroulement</h4>
+                    <div class="lcd-screen" style="margin: 20px 0; max-width: 450px;">
+                        <span class="lcd-line">Challenge 2     </span>
+                        <span class="lcd-line">Clone Master    </span>
+                    </div>
+
+                    <ol>
+                        <li>Le système affiche le défi pendant 3 secondes</li>
+                        <li>Touchez la clé source au lecteur</li>
+                        <li>Le système affiche l'ID de la clé à cloner</li>
+                        <li>Instructions pour le Flipper :
+                            <div class="lcd-screen" style="margin: 10px 0; max-width: 450px;">
+                                <span class="lcd-line">Flipper: Read   </span>
+                                <span class="lcd-line">then Write      </span>
+                            </div>
+                        </li>
+                        <li>Sur votre Flipper Zero :
+                            <ul>
+                                <li><strong>Read</strong> la clé source</li>
+                                <li><strong>Save</strong> les données</li>
+                                <li>Allez dans <strong>Saved</strong></li>
+                                <li>Sélectionnez la clé sauvegardée</li>
+                                <li>Choisissez <strong>Write</strong></li>
+                                <li>Touchez une clé vierge pour écrire</li>
+                            </ul>
+                        </li>
+                        <li>Touchez la clé clonée au lecteur du Raspberry Pi</li>
+                        <li>Le système vérifie que l'ID correspond</li>
+                    </ol>
+
+                    <h4>Validation</h4>
+                    <div class="success-box">
+                        <strong>✅ Succès :</strong> Le clone correspond à l'original (+10 points)
+                    </div>
+
+                    <div class="warning-box">
+                        <strong>❌ Échec :</strong> Si l'ID ne correspond pas, le défi échoue (0 points)
+                    </div>
+
+                    <h3>Défi 3 : Emulate Pro (10 points)</h3>
+
+                    <h4>Objectif</h4>
+                    <p>Maîtriser l'émulation d'une clé iButton avec le Flipper Zero</p>
+
+                    <h4>Déroulement</h4>
+                    <div class="lcd-screen" style="margin: 20px 0; max-width: 450px;">
+                        <span class="lcd-line">Challenge 3     </span>
+                        <span class="lcd-line">Emulate Pro     </span>
+                    </div>
+
+                    <ol>
+                        <li>Le système affiche le défi pendant 3 secondes</li>
+                        <li>Touchez la clé au lecteur pour obtenir l'ID cible</li>
+                        <li>Instructions d'émulation :
+                            <div class="lcd-screen" style="margin: 10px 0; max-width: 450px;">
+                                <span class="lcd-line">Flipper: Saved  </span>
+                                <span class="lcd-line">key -> Emulate  </span>
+                            </div>
+                        </li>
+                        <li>Sur votre Flipper Zero :
+                            <ul>
+                                <li>Allez dans <strong>iButton</strong></li>
+                                <li>Sélectionnez <strong>Saved</strong></li>
+                                <li>Choisissez la clé à émuler</li>
+                                <li>Appuyez sur <strong>Emulate</strong></li>
+                            </ul>
+                        </li>
+                        <li>Maintenez le Flipper près du lecteur (mode émulation actif)</li>
+                        <li>Le système détecte l'émulation et vérifie l'ID</li>
+                    </ol>
+
+                    <h4>Validation</h4>
+                    <div class="success-box">
+                        <strong>✅ Succès :</strong> L'émulation est détectée et l'ID correspond (+10 points)
+                    </div>
+
+                    <div class="info-box">
+                        <strong>💡 Astuce :</strong> L'émulation doit rester active pendant toute la durée de la lecture.
+                        Gardez le Flipper en position jusqu'à la confirmation de succès.
+                    </div>
+
+                    <h3>Sortir du module iButton</h3>
+                    <p>Appuyez sur <span class="button-legend">◄ LEFT</span> depuis le menu des défis pour revenir au menu principal.</p>
+                </section>
+
+                <!-- Module NFC -->
+                <section id="nfc">
+                    <h2>📡 Module NFC</h2>
+
+                    <div class="warning-box">
+                        <strong>🚧 Module en développement</strong>
+                        <p>Le module NFC sera disponible dans une prochaine version. Il proposera des défis sur :</p>
+                        <ul>
+                            <li>Lecture de cartes NFC (NTAG, MIFARE Classic, etc.)</li>
+                            <li>Émulation de cartes NFC</li>
+                            <li>Attaques MIFARE (authentification, extraction de clés)</li>
+                        </ul>
+                    </div>
+
+                    <h3>Accès au module</h3>
+                    <div class="lcd-screen" style="margin: 20px 0; max-width: 450px;">
+                        <span class="lcd-line">NFC - Soon!     </span>
+                        <span class="lcd-line">L=Back          </span>
+                    </div>
+
+                    <p>
+                        Appuyez sur <span class="button-legend">◄ LEFT</span> pour revenir au menu principal.
+                    </p>
+                </section>
+
+                <!-- Module RFID -->
+                <section id="rfid">
+                    <h2>📻 Module RFID</h2>
+
+                    <div class="warning-box">
+                        <strong>🚧 Module en développement</strong>
+                        <p>Le module RFID 125kHz sera disponible dans une prochaine version. Il proposera des défis sur :</p>
+                        <ul>
+                            <li>Lecture de badges RFID 125kHz</li>
+                            <li>Clonage de badges T5577</li>
+                            <li>Émulation de badges EM4100, HID Prox</li>
+                        </ul>
+                    </div>
+
+                    <h3>Accès au module</h3>
+                    <div class="lcd-screen" style="margin: 20px 0; max-width: 450px;">
+                        <span class="lcd-line">RFID - Soon!    </span>
+                        <span class="lcd-line">L=Back          </span>
+                    </div>
+
+                    <p>
+                        Appuyez sur <span class="button-legend">◄ LEFT</span> pour revenir au menu principal.
+                    </p>
+                </section>
+
+                <!-- Module IR -->
+                <section id="ir">
+                    <h2>🔴 Module IR</h2>
+
+                    <div class="warning-box">
+                        <strong>🚧 Module en développement</strong>
+                        <p>Le module infrarouge sera disponible dans une prochaine version. Il proposera des défis sur :</p>
+                        <ul>
+                            <li>Lecture de signaux IR (télécommandes TV, climatisation, etc.)</li>
+                            <li>Envoi de commandes IR</li>
+                            <li>Création de télécommandes universelles</li>
+                        </ul>
+                    </div>
+
+                    <h3>Accès au module</h3>
+                    <div class="lcd-screen" style="margin: 20px 0; max-width: 450px;">
+                        <span class="lcd-line">IR - Soon!      </span>
+                        <span class="lcd-line">L=Back          </span>
+                    </div>
+
+                    <p>
+                        Appuyez sur <span class="button-legend">◄ LEFT</span> pour revenir au menu principal.
+                    </p>
+                </section>
+
+                <!-- Paramètres -->
+                <section id="settings">
+                    <h2>⚙️ Paramètres</h2>
+
+                    <p>Le menu Settings permet de consulter vos statistiques et de réinitialiser votre progression.</p>
+
+                    <h3>Menu Settings</h3>
+                    <div class="lcd-screen" style="margin: 20px 0; max-width: 450px;">
+                        <span class="lcd-line">Settings        </span>
+                        <span class="lcd-line">1:Stat 2:Reset  </span>
+                    </div>
+
+                    <h3>Option 1 : Statistiques</h3>
+                    <p>Appuyez sur <span class="button-legend">● SELECT</span> pour voir vos statistiques détaillées.</p>
+
+                    <div class="lcd-screen" style="margin: 20px 0; max-width: 450px;">
+                        <span class="lcd-line">Score: 20/40    </span>
+                        <span class="lcd-line">2/3 Tries:5     </span>
+                    </div>
+
+                    <h4>Détails de l'affichage</h4>
+                    <ul>
+                        <li><code>Score: 20/40</code> : Score actuel sur le maximum possible</li>
+                        <li><code>2/3</code> : Nombre de défis complétés sur le total</li>
+                        <li><code>Tries:5</code> : Nombre total de tentatives effectuées</li>
+                    </ul>
+
+                    <p>L'écran s'affiche pendant 5 secondes, puis revient automatiquement au menu Settings.</p>
+
+                    <h3>Option 2 : Réinitialisation</h3>
+                    <p>Permet de réinitialiser tous les scores et l'historique des défis.</p>
+
+                    <div class="warning-box">
+                        <strong>⚠️ Attention :</strong> Cette action est irréversible !
+                    </div>
+
+                    <h4>Processus de réinitialisation</h4>
+                    <ol>
+                        <li>Depuis le menu Settings, sélectionnez l'option Reset</li>
+                        <li>Un écran de confirmation apparaît :
+                            <div class="lcd-screen" style="margin: 10px 0; max-width: 450px;">
+                                <span class="lcd-line">Reset scores?   </span>
+                                <span class="lcd-line">1:Yes 5:No      </span>
+                            </div>
+                        </li>
+                        <li>Appuyez sur <span class="button-legend">● SELECT</span> (bouton 1) pour confirmer</li>
+                        <li>Appuyez sur <span class="button-legend">◄ LEFT</span> (bouton 5) pour annuler</li>
+                    </ol>
+
+                    <h4>Confirmation de réinitialisation</h4>
+                    <div class="lcd-screen" style="margin: 20px 0; max-width: 450px;">
+                        <span class="lcd-line">Scores Reset!   </span>
+                        <span class="lcd-line">Progress cleared</span>
+                    </div>
+
+                    <p>Après réinitialisation, tous les défis redeviennent disponibles et le score retourne à 0/40.</p>
+
+                    <h3>Sortir des paramètres</h3>
+                    <p>Appuyez sur <span class="button-legend">◄ LEFT</span> depuis le menu Settings pour revenir au menu principal.</p>
+                </section>
+
+                <!-- Footer -->
+                <footer style="margin-top: 50px; padding-top: 30px; border-top: 2px solid #ddd; color: #666;">
+                    <p style="text-align: center;">
+                        <strong>ZeroRange v1.0</strong> - Système d'entraînement Flipper Zero<br>
+                        Développé avec ❤️ pour la communauté Flipper Zero
+                    </p>
+                </footer>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulation states
+        let currentMenu = 'main';
+        let selectedItem = 0;
+        let score = 0;
+
+        const menus = {
+            main: {
+                items: ['iButton', 'NFC', 'RFID', 'IR', 'Settings'],
+                line2: 'U/D SEL=Go L=Bk '
+            },
+            ibutton: {
+                line1: 'iBtn Challenges ',
+                line2: '0/3 SEL=Go L=Bk '
+            },
+            nfc: {
+                line1: 'NFC - Soon!     ',
+                line2: 'L=Back          '
+            },
+            rfid: {
+                line1: 'RFID - Soon!    ',
+                line2: 'L=Back          '
+            },
+            ir: {
+                line1: 'IR - Soon!      ',
+                line2: 'L=Back          '
+            },
+            settings: {
+                line1: 'Settings        ',
+                line2: '1:Stat 2:Reset  '
+            }
+        };
+
+        function updateDisplay() {
+            const line1 = document.getElementById('lcd-line1');
+            const line2 = document.getElementById('lcd-line2');
+
+            if (currentMenu === 'main') {
+                const item = menus.main.items[selectedItem];
+                const scoreText = `${score}/40`;
+                const padding = ' '.repeat(16 - 1 - item.length - scoreText.length);
+                line1.textContent = `>${item}${padding}${scoreText}`;
+                line2.textContent = menus.main.line2;
+            } else {
+                const menu = menus[currentMenu];
+                line1.textContent = menu.line1;
+                line2.textContent = menu.line2;
+            }
+        }
+
+        function pressButton(button) {
+            switch(button) {
+                case 'up':
+                    if (currentMenu === 'main') {
+                        selectedItem = (selectedItem - 1 + menus.main.items.length) % menus.main.items.length;
+                        updateDisplay();
+                    }
+                    break;
+                case 'down':
+                    if (currentMenu === 'main') {
+                        selectedItem = (selectedItem + 1) % menus.main.items.length;
+                        updateDisplay();
+                    }
+                    break;
+                case 'select':
+                    if (currentMenu === 'main') {
+                        const item = menus.main.items[selectedItem];
+                        if (item === 'iButton') {
+                            currentMenu = 'ibutton';
+                        } else if (item === 'NFC') {
+                            currentMenu = 'nfc';
+                        } else if (item === 'RFID') {
+                            currentMenu = 'rfid';
+                        } else if (item === 'IR') {
+                            currentMenu = 'ir';
+                        } else if (item === 'Settings') {
+                            currentMenu = 'settings';
+                        }
+                        updateDisplay();
+                    }
+                    break;
+                case 'left':
+                    if (currentMenu !== 'main') {
+                        currentMenu = 'main';
+                        updateDisplay();
+                    }
+                    break;
+            }
+        }
+
+        // Initialize display
+        updateDisplay();
+
+        // ==================== LANGUAGE SYSTEM ====================
+
+        const translations = {
+            fr: {
+                'header.subtitle': 'Système d\'entraînement Flipper Zero - Documentation complète',
+                'nav.title': '📖 Table des matières',
+                'nav.introduction': 'Introduction',
+                'nav.navigation': 'Navigation générale',
+                'nav.mainmenu': 'Menu principal',
+                'nav.ibutton': 'Module iButton',
+                'nav.nfc': 'Module NFC',
+                'nav.rfid': 'Module RFID',
+                'nav.ir': 'Module IR',
+                'nav.settings': 'Paramètres',
+                'footer.text': 'Développé avec ❤️ pour la communauté Flipper Zero'
+            },
+            en: {
+                'header.subtitle': 'Flipper Zero Training System - Complete Documentation',
+                'nav.title': '📖 Table of Contents',
+                'nav.introduction': 'Introduction',
+                'nav.navigation': 'General Navigation',
+                'nav.mainmenu': 'Main Menu',
+                'nav.ibutton': 'iButton Module',
+                'nav.nfc': 'NFC Module',
+                'nav.rfid': 'RFID Module',
+                'nav.ir': 'IR Module',
+                'nav.settings': 'Settings',
+                'footer.text': 'Developed with ❤️ for the Flipper Zero community'
+            }
+        };
+
+        let currentLang = localStorage.getItem('zerorange-lang') || 'fr';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('zerorange-lang', lang);
+
+            // Update button states
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update all translatable elements
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+
+            // Update HTML lang attribute
+            document.documentElement.lang = lang;
+
+            // Reload content based on language
+            loadContent(lang);
+        }
+
+        function loadContent(lang) {
+            const documentation = document.querySelector('.documentation');
+
+            if (lang === 'fr') {
+                documentation.innerHTML = getFrenchContent();
+            } else {
+                documentation.innerHTML = getEnglishContent();
+            }
+        }
+
+        function getFrenchContent() {
+            return `
+                <nav>
+                    <h3 data-i18n="nav.title">📖 Table des matières</h3>
+                    <ul>
+                        <li><a href="#introduction" data-i18n="nav.introduction">Introduction</a></li>
+                        <li><a href="#navigation" data-i18n="nav.navigation">Navigation générale</a></li>
+                        <li><a href="#menu-principal" data-i18n="nav.mainmenu">Menu principal</a></li>
+                        <li><a href="#ibutton" data-i18n="nav.ibutton">Module iButton</a></li>
+                        <li><a href="#nfc" data-i18n="nav.nfc">Module NFC</a></li>
+                        <li><a href="#rfid" data-i18n="nav.rfid">Module RFID</a></li>
+                        <li><a href="#ir" data-i18n="nav.ir">Module IR</a></li>
+                        <li><a href="#settings" data-i18n="nav.settings">Paramètres</a></li>
+                    </ul>
+                </nav>
+
+                <section id="introduction">
+                    <h2>📱 Introduction</h2>
+                    <p>
+                        <strong>ZeroRange</strong> est un système d'entraînement interactif conçu pour maîtriser les fonctionnalités
+                        du Flipper Zero. Il propose une série de défis pratiques dans différents domaines : iButton, NFC, RFID et infrarouge.
+                    </p>
+                    <div class="info-box">
+                        <strong>🎯 Objectif :</strong> Accumuler des points en complétant des défis de difficulté croissante.
+                        Score maximum : <strong>40 points</strong>
+                    </div>
+                    <h3>Matériel requis</h3>
+                    <ul>
+                        <li>Raspberry Pi (testé sur Pi 5)</li>
+                        <li>Adafruit RGB LCD Shield 16x2 avec boutons</li>
+                        <li>Flipper Zero</li>
+                        <li>Interface iButton (GPIO 4)</li>
+                    </ul>
+                </section>
+
+                <section id="navigation">
+                    <h2>🧭 Navigation générale</h2>
+                    <h3>Les boutons</h3>
+                    <p>Le système utilise 5 boutons pour la navigation :</p>
+                    <table>
+                        <tr>
+                            <th>Bouton</th>
+                            <th>Fonction</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td><span class="button-legend">▲ UP</span></td>
+                            <td>Naviguer vers le haut</td>
+                            <td>Permet de remonter dans une liste d'options ou de menu</td>
+                        </tr>
+                        <tr>
+                            <td><span class="button-legend">▼ DOWN</span></td>
+                            <td>Naviguer vers le bas</td>
+                            <td>Permet de descendre dans une liste d'options ou de menu</td>
+                        </tr>
+                        <tr>
+                            <td><span class="button-legend">● SELECT</span></td>
+                            <td>Sélectionner / Confirmer</td>
+                            <td>Valide le choix actuel ou entre dans un sous-menu</td>
+                        </tr>
+                        <tr>
+                            <td><span class="button-legend">◄ LEFT</span></td>
+                            <td>Retour</td>
+                            <td>Revient au menu précédent ou annule une action</td>
+                        </tr>
+                        <tr>
+                            <td><span class="button-legend">► RIGHT</span></td>
+                            <td>Réservé</td>
+                            <td>Fonction contextuelle selon le menu</td>
+                        </tr>
+                    </table>
+                    <h3>Comprendre l'affichage LCD</h3>
+                    <p>L'écran LCD 16x2 affiche les informations sur deux lignes de 16 caractères :</p>
+                    <h4>Format d'affichage standard</h4>
+                    <div class="lcd-screen" style="margin: 20px 0; max-width: 450px;">
+                        <span class="lcd-line">&gt;iButton      0/40</span>
+                        <span class="lcd-line">U/D SEL=Go L=Bk </span>
+                    </div>
+                    <ul>
+                        <li><code>&gt;</code> : Indicateur de sélection</li>
+                        <li><code>0/40</code> : Score actuel / Score maximum</li>
+                        <li><code>U/D</code> : Up/Down - Boutons haut/bas</li>
+                        <li><code>SEL=Go</code> : SELECT pour valider</li>
+                        <li><code>L=Bk</code> : LEFT pour retour</li>
+                    </ul>
+                </section>
+
+                <section id="menu-principal">
+                    <h2>🏠 Menu principal</h2>
+                    <p>Le menu principal est le point d'entrée du système.</p>
+                    <table>
+                        <tr><th>Option</th><th>État</th><th>Description</th></tr>
+                        <tr><td>iButton</td><td>✅ Disponible</td><td>3 défis (10 points chacun)</td></tr>
+                        <tr><td>NFC</td><td>🚧 À venir</td><td>Défis NFC</td></tr>
+                        <tr><td>RFID</td><td>🚧 À venir</td><td>Défis RFID 125kHz</td></tr>
+                        <tr><td>IR</td><td>🚧 À venir</td><td>Défis infrarouge</td></tr>
+                        <tr><td>Settings</td><td>✅ Disponible</td><td>Statistiques et réinitialisation</td></tr>
+                    </table>
+                </section>
+
+                <section id="ibutton">
+                    <h2>🔑 Module iButton</h2>
+                    <p>3 défis pour maîtriser les clés iButton (Dallas 1-Wire).</p>
+                    <h3>Défi 1 : Touch & Read (10 points)</h3>
+                    <p>Apprendre à lire une clé iButton avec le Flipper Zero.</p>
+                    <h3>Défi 2 : Clone Master (10 points)</h3>
+                    <p>Cloner une clé iButton sur une clé vierge.</p>
+                    <h3>Défi 3 : Emulate Pro (10 points)</h3>
+                    <p>Maîtriser l'émulation d'une clé iButton.</p>
+                </section>
+
+                <section id="nfc">
+                    <h2>📡 Module NFC</h2>
+                    <div class="warning-box">
+                        <strong>🚧 Module en développement</strong>
+                        <p>Bientôt disponible avec des défis NFC.</p>
+                    </div>
+                </section>
+
+                <section id="rfid">
+                    <h2>📻 Module RFID</h2>
+                    <div class="warning-box">
+                        <strong>🚧 Module en développement</strong>
+                        <p>Bientôt disponible avec des défis RFID 125kHz.</p>
+                    </div>
+                </section>
+
+                <section id="ir">
+                    <h2>🔴 Module IR</h2>
+                    <div class="warning-box">
+                        <strong>🚧 Module en développement</strong>
+                        <p>Bientôt disponible avec des défis infrarouge.</p>
+                    </div>
+                </section>
+
+                <section id="settings">
+                    <h2>⚙️ Paramètres</h2>
+                    <p>Consultation des statistiques et réinitialisation de la progression.</p>
+                    <h3>Option 1 : Statistiques</h3>
+                    <p>Voir vos statistiques détaillées.</p>
+                    <h3>Option 2 : Réinitialisation</h3>
+                    <div class="warning-box">
+                        <strong>⚠️ Attention :</strong> Action irréversible !
+                    </div>
+                </section>
+
+                <footer style="margin-top: 50px; padding-top: 30px; border-top: 2px solid #ddd; color: #666;">
+                    <p style="text-align: center;">
+                        <strong>ZeroRange v1.0</strong> - Système d'entraînement Flipper Zero<br>
+                        <span data-i18n="footer.text">Développé avec ❤️ pour la communauté Flipper Zero</span>
+                    </p>
+                </footer>
+            `;
+        }
+
+        function getEnglishContent() {
+            return `
+                <nav>
+                    <h3 data-i18n="nav.title">📖 Table of Contents</h3>
+                    <ul>
+                        <li><a href="#introduction" data-i18n="nav.introduction">Introduction</a></li>
+                        <li><a href="#navigation" data-i18n="nav.navigation">General Navigation</a></li>
+                        <li><a href="#menu-principal" data-i18n="nav.mainmenu">Main Menu</a></li>
+                        <li><a href="#ibutton" data-i18n="nav.ibutton">iButton Module</a></li>
+                        <li><a href="#nfc" data-i18n="nav.nfc">NFC Module</a></li>
+                        <li><a href="#rfid" data-i18n="nav.rfid">RFID Module</a></li>
+                        <li><a href="#ir" data-i18n="nav.ir">IR Module</a></li>
+                        <li><a href="#settings" data-i18n="nav.settings">Settings</a></li>
+                    </ul>
+                </nav>
+
+                <section id="introduction">
+                    <h2>📱 Introduction</h2>
+                    <p>
+                        <strong>ZeroRange</strong> is an interactive training system designed to master
+                        Flipper Zero features. It offers a series of practical challenges in different areas: iButton, NFC, RFID and infrared.
+                    </p>
+                    <div class="info-box">
+                        <strong>🎯 Goal:</strong> Accumulate points by completing challenges of increasing difficulty.
+                        Maximum score: <strong>40 points</strong>
+                    </div>
+                    <h3>Required Hardware</h3>
+                    <ul>
+                        <li>Raspberry Pi (tested on Pi 5)</li>
+                        <li>Adafruit RGB LCD Shield 16x2 with buttons</li>
+                        <li>Flipper Zero</li>
+                        <li>iButton Interface (GPIO 4)</li>
+                    </ul>
+                </section>
+
+                <section id="navigation">
+                    <h2>🧭 General Navigation</h2>
+                    <h3>Buttons</h3>
+                    <p>The system uses 5 buttons for navigation:</p>
+                    <table>
+                        <tr>
+                            <th>Button</th>
+                            <th>Function</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td><span class="button-legend">▲ UP</span></td>
+                            <td>Navigate up</td>
+                            <td>Moves up in an options list or menu</td>
+                        </tr>
+                        <tr>
+                            <td><span class="button-legend">▼ DOWN</span></td>
+                            <td>Navigate down</td>
+                            <td>Moves down in an options list or menu</td>
+                        </tr>
+                        <tr>
+                            <td><span class="button-legend">● SELECT</span></td>
+                            <td>Select / Confirm</td>
+                            <td>Validates current choice or enters a submenu</td>
+                        </tr>
+                        <tr>
+                            <td><span class="button-legend">◄ LEFT</span></td>
+                            <td>Back</td>
+                            <td>Returns to previous menu or cancels action</td>
+                        </tr>
+                        <tr>
+                            <td><span class="button-legend">► RIGHT</span></td>
+                            <td>Reserved</td>
+                            <td>Contextual function depending on menu</td>
+                        </tr>
+                    </table>
+                    <h3>Understanding the LCD Display</h3>
+                    <p>The 16x2 LCD displays information on two lines of 16 characters:</p>
+                    <h4>Standard Display Format</h4>
+                    <div class="lcd-screen" style="margin: 20px 0; max-width: 450px;">
+                        <span class="lcd-line">&gt;iButton      0/40</span>
+                        <span class="lcd-line">U/D SEL=Go L=Bk </span>
+                    </div>
+                    <ul>
+                        <li><code>&gt;</code> : Selection indicator</li>
+                        <li><code>0/40</code> : Current score / Maximum score</li>
+                        <li><code>U/D</code> : Up/Down buttons</li>
+                        <li><code>SEL=Go</code> : SELECT to validate</li>
+                        <li><code>L=Bk</code> : LEFT to go back</li>
+                    </ul>
+                </section>
+
+                <section id="menu-principal">
+                    <h2>🏠 Main Menu</h2>
+                    <p>The main menu is the system's entry point.</p>
+                    <table>
+                        <tr><th>Option</th><th>Status</th><th>Description</th></tr>
+                        <tr><td>iButton</td><td>✅ Available</td><td>3 challenges (10 points each)</td></tr>
+                        <tr><td>NFC</td><td>🚧 Coming soon</td><td>NFC challenges</td></tr>
+                        <tr><td>RFID</td><td>🚧 Coming soon</td><td>RFID 125kHz challenges</td></tr>
+                        <tr><td>IR</td><td>🚧 Coming soon</td><td>Infrared challenges</td></tr>
+                        <tr><td>Settings</td><td>✅ Available</td><td>Statistics and reset</td></tr>
+                    </table>
+                </section>
+
+                <section id="ibutton">
+                    <h2>🔑 iButton Module</h2>
+                    <p>3 challenges to master iButton keys (Dallas 1-Wire).</p>
+                    <h3>Challenge 1: Touch & Read (10 points)</h3>
+                    <p>Learn to read an iButton key with Flipper Zero.</p>
+                    <h3>Challenge 2: Clone Master (10 points)</h3>
+                    <p>Clone an iButton key to a blank key.</p>
+                    <h3>Challenge 3: Emulate Pro (10 points)</h3>
+                    <p>Master iButton key emulation.</p>
+                </section>
+
+                <section id="nfc">
+                    <h2>📡 NFC Module</h2>
+                    <div class="warning-box">
+                        <strong>🚧 Under Development</strong>
+                        <p>Coming soon with NFC challenges.</p>
+                    </div>
+                </section>
+
+                <section id="rfid">
+                    <h2>📻 RFID Module</h2>
+                    <div class="warning-box">
+                        <strong>🚧 Under Development</strong>
+                        <p>Coming soon with RFID 125kHz challenges.</p>
+                    </div>
+                </section>
+
+                <section id="ir">
+                    <h2>🔴 IR Module</h2>
+                    <div class="warning-box">
+                        <strong>🚧 Under Development</strong>
+                        <p>Coming soon with infrared challenges.</p>
+                    </div>
+                </section>
+
+                <section id="settings">
+                    <h2>⚙️ Settings</h2>
+                    <p>View statistics and reset progress.</p>
+                    <h3>Option 1: Statistics</h3>
+                    <p>View your detailed statistics.</p>
+                    <h3>Option 2: Reset</h3>
+                    <div class="warning-box">
+                        <strong>⚠️ Warning:</strong> Irreversible action!
+                    </div>
+                </section>
+
+                <footer style="margin-top: 50px; padding-top: 30px; border-top: 2px solid #ddd; color: #666;">
+                    <p style="text-align: center;">
+                        <strong>ZeroRange v1.0</strong> - Flipper Zero Training System<br>
+                        <span data-i18n="footer.text">Developed with ❤️ for the Flipper Zero community</span>
+                    </p>
+                </footer>
+            `;
+        }
+
+        // Initialize language on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('zerorange-lang') || 'fr';
+
+            // Update button states without triggering change
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if ((savedLang === 'fr' && btn.textContent.includes('FR')) ||
+                    (savedLang === 'en' && btn.textContent.includes('EN'))) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Load initial content
+            if (savedLang === 'en') {
+                loadContent('en');
+                document.documentElement.lang = 'en';
+            }
+        });
+    </script>
+</body>
+</html>

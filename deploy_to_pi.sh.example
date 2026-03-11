@@ -1,0 +1,105 @@
+#!/bin/bash
+# Script de deploiement rapide vers le Raspberry Pi
+# A executer depuis ton Mac quand tu es connecte au reseau
+#
+# CONFIGURATION:
+# 1. Copie ce fichier: cp deploy_to_pi.sh.example deploy_to_pi.sh
+# 2. Modifie les variables ci-dessous avec tes informations
+# 3. chmod +x deploy_to_pi.sh
+
+set -e
+
+# === CONFIGURATION - A MODIFIER ===
+PI_USER="your_username"
+PI_HOST="192.168.1.xxx"
+PI_PASS="your_password"
+PI_DIR="/home/your_username/ZeroRange"
+# ==================================
+
+echo "=== Deploiement ZeroRange vers Raspberry Pi ==="
+echo ""
+
+# Check if sshpass is installed
+if ! command -v sshpass &> /dev/null; then
+    echo "sshpass n'est pas installe"
+    echo "Installation: brew install sshpass"
+    exit 1
+fi
+
+# Check connectivity
+echo "Verification de la connexion..."
+if ! ping -c 1 -W 1 $PI_HOST &> /dev/null; then
+    echo "Impossible de joindre $PI_HOST"
+    echo "Verifie que tu es sur le meme reseau que le Raspberry Pi"
+    exit 1
+fi
+echo "Connexion OK"
+
+# Copy files
+echo ""
+echo "Copie des fichiers principaux..."
+sshpass -p "$PI_PASS" scp -o StrictHostKeyChecking=no \
+    start_all.sh \
+    stop_all.sh \
+    install_service.sh \
+    zerorange.service \
+    ibutton_handler.py \
+    $PI_USER@$PI_HOST:$PI_DIR/
+
+echo "Copie des scripts WiFi hotspot..."
+sshpass -p "$PI_PASS" scp -o StrictHostKeyChecking=no \
+    setup_hotspot.sh \
+    disable_hotspot.sh \
+    $PI_USER@$PI_HOST:$PI_DIR/
+
+echo "Copie de la documentation..."
+sshpass -p "$PI_PASS" scp -o StrictHostKeyChecking=no \
+    INSTALLATION.md \
+    IBUTTON_IDS.md \
+    QUICK_START.md \
+    WIFI_HOTSPOT.md \
+    README_HOTSPOT.md \
+    NOUVEAUTES_WIFI.md \
+    PROJECT_DESCRIPTION.md \
+    $PI_USER@$PI_HOST:$PI_DIR/
+
+echo "Tous les fichiers copies"
+
+# Make scripts executable
+echo ""
+echo "Configuration des permissions..."
+sshpass -p "$PI_PASS" ssh -o StrictHostKeyChecking=no $PI_USER@$PI_HOST \
+    "chmod +x $PI_DIR/*.sh"
+echo "Scripts rendus executables"
+
+# Ask if should install service
+echo ""
+read -p "Installer le service systemd maintenant? (y/n) " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    echo ""
+    echo "Installation du service..."
+    sshpass -p "$PI_PASS" ssh -o StrictHostKeyChecking=no $PI_USER@$PI_HOST \
+        "cd $PI_DIR && sudo bash install_service.sh"
+
+    echo ""
+    echo "Installation terminee!"
+    echo ""
+    echo "Services accessibles:"
+    echo "  - Interface web: http://$PI_HOST:8000"
+    echo "  - API LCD: http://$PI_HOST:5000"
+    echo "  - Application LCD: Sur l'ecran physique"
+    echo ""
+    echo "Note: Le script d'installation a propose d'activer le hotspot WiFi."
+    echo "Si active, le Raspberry Pi creera un reseau WiFi 'ZeroRange'"
+    echo "Accessible via: http://10.0.0.1:8000 (apres connexion au WiFi)"
+else
+    echo ""
+    echo "Pour installer le service plus tard, connecte-toi au Pi et lance:"
+    echo "  ssh $PI_USER@$PI_HOST"
+    echo "  cd $PI_DIR"
+    echo "  sudo bash install_service.sh"
+fi
+
+echo ""
+echo "=== Deploiement termine! ==="
