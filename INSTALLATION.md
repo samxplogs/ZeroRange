@@ -1,240 +1,188 @@
-# Installation du service ZeroRange
+# Installation Guide
 
-Ce guide explique comment installer ZeroRange en tant que service systemd qui démarre automatiquement au boot du Raspberry Pi.
+Full installation guide for ZeroRange on a Raspberry Pi.
 
-## 📦 Ce qui sera installé
+## Prerequisites
 
-Le service systemd lance automatiquement **3 services** au démarrage:
+### Hardware
+- Raspberry Pi 5 (or Pi 4)
+- Adafruit I2C 16x2 RGB LCD Shield
+- iButton USB Reader (HID keyboard emulation)
+- Proxmark3 (optional, for NFC/RFID challenges)
+- HackRF One (optional, for SubGHZ challenges)
 
-1. **Application principale ZeroRange** - LCD + Boutons + Challenges
-2. **Serveur HTTP** (port 8000) - Documentation et interface web
-3. **API LCD** (port 5000) - Contrôle du LCD depuis le web
+### Software
+- Raspberry Pi OS (Bookworm or later)
+- Python 3.9+
+- I2C enabled (`sudo raspi-config` > Interface Options > I2C > Enable)
 
-## 🚀 Installation rapide
-
-### Depuis le réseau (si connecté au Raspberry Pi)
+## Step 1: Clone the repository
 
 ```bash
-# Depuis ton Mac
-scp -r /path/to/ZeroRange/* user@RASPBERRY_IP:/home/sam/ZeroRange/
+git clone https://github.com/samxplogs/ZeroRange.git
+cd ZeroRange
+```
 
-# Puis sur le Raspberry Pi
-ssh user@RASPBERRY_IP
+## Step 2: Install dependencies
+
+```bash
+# System packages
+sudo apt-get update
+sudo apt-get install -y python3-pip python3-smbus python3-evdev i2c-tools git
+
+# Python packages
+pip3 install -r requirements.txt
+
+# LCD support
+sudo apt-get install -y python3-adafruit-circuitpython-charlcd
+```
+
+## Step 3: Verify hardware
+
+```bash
+# Check I2C (should show 0x20, 0x27, or 0x3F)
+sudo i2cdetect -y 1
+
+# Check iButton USB reader
+ls -la /dev/input/by-id/ | grep c216
+
+# Check Proxmark3 (if connected)
+lsusb | grep -i proxmark
+
+# Check HackRF (if connected)
+lsusb | grep -i hackrf
+```
+
+## Step 4: Run ZeroRange
+
+```bash
+sudo python3 zerorange.py
+```
+
+> `sudo` is required for access to I2C, USB HID devices, and Proxmark3.
+
+## Auto-start (systemd service)
+
+Install ZeroRange as a service that starts automatically on boot:
+
+```bash
+sudo bash install_service.sh
+```
+
+This starts 3 services:
+1. **ZeroRange** - Main application (LCD + challenges)
+2. **HTTP server** (port 8000) - Web interface and documentation
+3. **LCD API** (port 5000) - Remote LCD control via REST
+
+### Service management
+
+```bash
+sudo systemctl status zerorange    # Check status
+sudo systemctl restart zerorange   # Restart
+sudo systemctl stop zerorange      # Stop
+sudo systemctl start zerorange     # Start
+sudo journalctl -u zerorange -f    # View live logs
+```
+
+## WiFi Hotspot (optional)
+
+Create a standalone WiFi access point so ZeroRange works anywhere without an existing network:
+
+```bash
+sudo bash setup_hotspot.sh
+sudo reboot
+```
+
+After reboot:
+- Connect to WiFi network **ZeroRange** with the password you configured in `setup_hotspot.sh`
+- A captive portal opens automatically
+- Web interface: `http://10.0.0.1:8000`
+- SSH: `ssh sam@10.0.0.1`
+
+> Edit `setup_hotspot.sh` to set your own WiFi password before running it.
+
+## Web Interface
+
+Access the web interface from any device on the same network:
+
+```
+http://<RASPBERRY_PI_IP>:8000
+```
+
+> The Pi gets its IP via DHCP. Run `hostname -I` on the Pi to find it.
+> In hotspot mode, the IP is always `10.0.0.1`.
+
+### Available pages
+
+| Page | URL | Description |
+|------|-----|-------------|
+| Home | `/home.html` | LCD simulator in real-time |
+| Documentation | `/documentation.html` | Full challenge guide |
+| Contact | `/contact.html` | Contact info |
+
+### LCD API endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/lcd` | Current LCD state |
+| POST | `/lcd/clear` | Clear the LCD |
+| POST | `/lcd/write` | Write text to LCD |
+| POST | `/button/{num}` | Simulate a button press |
+
+## Deploying from another machine
+
+You can deploy from your computer to the Pi over the network:
+
+```bash
+# Copy files to the Pi
+scp -r ZeroRange/* user@<RASPBERRY_PI_IP>:/home/sam/ZeroRange/
+
+# SSH into the Pi and install
+ssh user@<RASPBERRY_PI_IP>
 cd /home/sam/ZeroRange
 sudo bash install_service.sh
 ```
 
-### Depuis le Raspberry Pi directement
+Or use the provided deploy script (edit it first with your Pi's IP):
 
 ```bash
-cd /home/sam/ZeroRange
-sudo bash install_service.sh
+cp deploy_to_pi.sh.example deploy_to_pi.sh
+# Edit deploy_to_pi.sh with your Pi's IP and credentials
+./deploy_to_pi.sh
 ```
 
-## 📋 Détails de l'installation
+## Troubleshooting
 
-Le script `install_service.sh` effectue les actions suivantes:
-
-1. Rend les scripts exécutables (`start_all.sh`, `stop_all.sh`)
-2. Copie le fichier de service dans `/etc/systemd/system/`
-3. Crée les répertoires de logs dans `/var/log/zerorange/`
-4. Active le service au démarrage
-5. Démarre le service immédiatement
-
-## 🎮 Gestion du service
-
-### Commandes de base
-
+### Service won't start
 ```bash
-# Voir le statut
-sudo systemctl status zerorange
-
-# Démarrer
-sudo systemctl start zerorange
-
-# Arrêter
-sudo systemctl stop zerorange
-
-# Redémarrer
-sudo systemctl restart zerorange
-
-# Désactiver le démarrage automatique
-sudo systemctl disable zerorange
-
-# Réactiver le démarrage automatique
-sudo systemctl enable zerorange
-```
-
-### Logs
-
-```bash
-# Voir tous les logs
-sudo journalctl -u zerorange
-
-# Voir les logs en temps réel
-sudo journalctl -u zerorange -f
-
-# Voir les dernières lignes
-sudo journalctl -u zerorange -n 50
-
-# Logs des services individuels
-tail -f /var/log/zerorange/zerorange.log   # Application principale
-tail -f /var/log/zerorange/http.log        # Serveur HTTP
-tail -f /var/log/zerorange/lcd_api.log     # API LCD
-```
-
-## 🌐 Accès aux services
-
-Une fois le service démarré, les interfaces sont accessibles:
-
-### Interface Web (Documentation)
-```
-http://[IP_DU_RASPBERRY_PI]:8000
-http://<RASPBERRY_PI_IP>:8000  (IP assigned via DHCP — run `hostname -I` on the Pi)
-```
-
-Pages disponibles:
-- `/home.html` - Simulateur LCD en temps réel
-- `/documentation.html` - Documentation complète
-- `/contact.html` - Informations de contact
-
-### API LCD (Contrôle à distance)
-```
-http://[IP_DU_RASPBERRY_PI]:5000
-```
-
-Endpoints:
-- `GET /lcd` - État actuel du LCD
-- `POST /lcd/clear` - Effacer le LCD
-- `POST /lcd/write` - Écrire du texte
-- `POST /button/{button_num}` - Simuler un appui de bouton
-
-### Application principale
-Accessible directement sur le LCD physique du Raspberry Pi.
-
-## 🔧 Personnalisation
-
-### Modifier les ports
-
-Édite le fichier `start_all.sh`:
-
-```bash
-nano /home/sam/ZeroRange/start_all.sh
-
-# Ligne HTTP server
-python3 -m http.server 8000  # Changer 8000 pour un autre port
-
-# Ligne web_lcd_server.py
-# Édite web_lcd_server.py pour changer le port 5000
-```
-
-### Ajouter d'autres services
-
-Ajoute des commandes dans `start_all.sh` avant le lancement de `zerorange.py`.
-
-## 🐛 Dépannage
-
-### Le service ne démarre pas
-
-```bash
-# Vérifier les erreurs
 sudo journalctl -u zerorange -xe
-
-# Tester manuellement
-cd /home/sam/ZeroRange
-sudo bash start_all.sh
+cd /home/sam/ZeroRange && sudo bash start_all.sh
 ```
 
-### Ports déjà utilisés
-
+### LCD not detected
 ```bash
-# Vérifier quels processus utilisent les ports
-sudo netstat -tlnp | grep -E '(8000|5000)'
+sudo i2cdetect -y 1
+# Should show 0x20, 0x27, or 0x3F
+```
 
-# Tuer les processus
+### iButton not reading
+```bash
+sudo python3 test_usb_ibutton.py
+```
+
+### Ports already in use
+```bash
+sudo netstat -tlnp | grep -E '(8000|5000)'
 sudo pkill -f "http.server 8000"
 sudo pkill -f "web_lcd_server"
 ```
 
-### Plusieurs instances qui tournent
+## Uninstall
 
 ```bash
-# Tout arrêter
-sudo systemctl stop zerorange
-sudo bash /home/sam/ZeroRange/stop_all.sh
-sudo pkill -9 -f "python3.*zerorange"
-
-# Redémarrer
-sudo systemctl start zerorange
-```
-
-## 📝 Structure des fichiers
-
-```
-/home/sam/ZeroRange/
-├── start_all.sh          # Script de démarrage complet
-├── stop_all.sh           # Script d'arrêt complet
-├── install_service.sh    # Script d'installation
-├── zerorange.service     # Fichier de service systemd
-├── zerorange.py          # Application principale
-├── web_lcd_server.py     # API Flask pour LCD
-└── web/                  # Fichiers web statiques
-    ├── home.html
-    ├── documentation.html
-    └── contact.html
-
-/etc/systemd/system/
-└── zerorange.service     # Service installé
-
-/var/log/zerorange/
-├── zerorange.log         # Logs application principale
-├── http.log              # Logs serveur HTTP
-└── lcd_api.log           # Logs API LCD
-
-/var/run/zerorange/
-├── http.pid              # PID serveur HTTP
-└── lcd_api.pid           # PID API LCD
-```
-
-## ✅ Vérification post-installation
-
-```bash
-# 1. Vérifier que le service tourne
-sudo systemctl status zerorange
-
-# 2. Vérifier les processus
-ps aux | grep -E '(zerorange|http.server|web_lcd)'
-
-# 3. Vérifier les ports
-sudo netstat -tlnp | grep -E '(8000|5000)'
-
-# 4. Tester l'interface web
-curl http://localhost:8000/home.html
-
-# 5. Tester l'API LCD
-curl http://localhost:5000/lcd
-```
-
-## 🎯 Désinstallation
-
-```bash
-# Arrêter et désactiver le service
 sudo systemctl stop zerorange
 sudo systemctl disable zerorange
-
-# Supprimer le fichier de service
 sudo rm /etc/systemd/system/zerorange.service
-
-# Recharger systemd
 sudo systemctl daemon-reload
-
-# Supprimer les logs (optionnel)
-sudo rm -rf /var/log/zerorange
-sudo rm -rf /var/run/zerorange
+sudo rm -rf /var/log/zerorange /var/run/zerorange
 ```
-
-## 📚 Ressources
-
-- [Documentation systemd](https://www.freedesktop.org/software/systemd/man/systemd.service.html)
-- [Guide Flask](https://flask.palletsprojects.com/)
-- [Python HTTP Server](https://docs.python.org/3/library/http.server.html)

@@ -106,17 +106,55 @@ USB Port 3    ─────────────► HackRF One (SubGHZ)
 
 ## Quick Start
 
+### On the Raspberry Pi
+
 ```bash
 # Clone the repository
 git clone https://github.com/samxplogs/ZeroRange.git
 cd ZeroRange
 
-# Install dependencies
+# Install system dependencies
+sudo apt-get update
+sudo apt-get install -y python3-pip python3-smbus python3-evdev i2c-tools
+
+# Install Python dependencies
 pip3 install -r requirements.txt
 
 # Run ZeroRange
-python3 zerorange.py
+sudo python3 zerorange.py
 ```
+
+> `sudo` is required for hardware access (I2C, USB HID, Proxmark3).
+
+### Auto-start as a service
+
+```bash
+sudo bash install_service.sh
+```
+
+This installs a systemd service that automatically starts ZeroRange on boot, including the web interface (port 8000) and LCD API (port 5000).
+
+### WiFi Hotspot (optional)
+
+Make ZeroRange fully portable — no existing network required:
+
+```bash
+sudo bash setup_hotspot.sh
+sudo reboot
+```
+
+After reboot, connect to the **ZeroRange** WiFi network. A captive portal redirects you to the web interface automatically.
+
+### Web Interface
+
+Once running, access the web interface at:
+
+```
+http://<RASPBERRY_PI_IP>:8000
+```
+
+> The Pi gets its IP via DHCP. Run `hostname -I` on the Pi to find it.
+> In hotspot mode, the IP is `10.0.0.1`.
 
 For detailed installation instructions, see [INSTALLATION.md](INSTALLATION.md).
 
