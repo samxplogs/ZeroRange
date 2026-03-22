@@ -17,13 +17,11 @@
 </p>
 
 <p align="center">
-  <img src="Gemini_Generated_Image_57n5cv57n5cv57n5.png" alt="ZeroRange" width="600"/>
-</p>
-
-<p align="center">
   <a href="https://www.youtube.com/watch?v=4Ge5imIA0S0">
     <img src="https://img.youtube.com/vi/4Ge5imIA0S0/maxresdefault.jpg" alt="Watch ZeroRange in action" width="600"/>
   </a>
+  <br/>
+  <a href="https://www.youtube.com/watch?v=4Ge5imIA0S0">▶ Watch on YouTube</a>
 </p>
 
 ---
