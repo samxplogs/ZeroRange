@@ -24,6 +24,14 @@
   <a href="https://www.youtube.com/watch?v=4Ge5imIA0S0">▶ Watch on YouTube</a>
 </p>
 
+<p align="center">
+  <img src="setup_compressed.jpg" alt="ZeroRange hardware setup" width="600"/>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/lcd_menu_main.png" alt="LCD main menu" width="400"/>
+</p>
+
 ---
 
 ## 📟 LCD Interface Preview
