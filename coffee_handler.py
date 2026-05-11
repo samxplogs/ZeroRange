@@ -28,6 +28,7 @@ except ImportError:
 from challenges.coffee.stage1_technician import Stage1
 from challenges.coffee.stage2_dump import Stage2
 from challenges.coffee.stage3_refill import Stage3
+from challenges.coffee.prep_badges import PrepBadges
 
 logger = logging.getLogger(__name__)
 
@@ -155,31 +156,45 @@ class CoffeeHandler:
             time.sleep(1.5)
 
     def _stage_menu(self) -> int:
-        """Show the three-stage sub-menu and return the selected stage (1-3) or 0 for back."""
+        """Show the stage + prep sub-menu.
+
+        Returns:
+            1-3  — launch that stage
+            4    — launch prep badges
+            0    — back to main menu
+        """
         selected = 0
-        stages = ["Stage1:iButton", "Stage2:Crack", "Stage3:Refill"]
+        # items: (label, challenge_id_or_None)
+        items = [
+            ("Stage1:iButton", 16),
+            ("Stage2:Crack",   17),
+            ("Stage3:Refill",  18),
+            ("Prep Badges",    None),
+        ]
 
         while True:
             score = self.get_module_score()
-            stage_label = stages[selected]
-            cid = 16 + selected
-            status = self.db.get_challenge_status(cid)
-            done = status and status["completed"]
-            marker = "✓" if done else " "
+            label, cid = items[selected]
+            if cid is not None:
+                status = self.db.get_challenge_status(cid)
+                done = status and status["completed"]
+                marker = "\x07" if done else " "   # checkmark glyph or space
+            else:
+                marker = " "
 
             self.lcd.clear()
-            self.lcd.write_line(0, f">{stage_label[:14]}{marker}")
+            self.lcd.write_line(0, f">{label[:14]}{marker}")
             self.lcd.write_line(1, f"U/D SEL=Go {score}/30")
 
             if self.lcd.button_pressed(2):
                 self.lcd.wait_button_release(2)
-                selected = (selected - 1) % 3
+                selected = (selected - 1) % len(items)
             elif self.lcd.button_pressed(3):
                 self.lcd.wait_button_release(3)
-                selected = (selected + 1) % 3
+                selected = (selected + 1) % len(items)
             elif self.lcd.button_pressed(1):
                 self.lcd.wait_button_release(1)
-                return selected + 1
+                return selected + 1   # 1=Stage1, 2=Stage2, 3=Stage3, 4=Prep
             elif self.lcd.button_pressed(5):
                 self.lcd.wait_button_release(5)
                 return 0
@@ -222,6 +237,18 @@ class CoffeeHandler:
             handler = Stage2(self.lcd, self.db, self.cfg, self.pm3, self.sse)
         elif stage_num == 3:
             handler = Stage3(self.lcd, self.db, self.cfg, self.pm3, self.sse)
+        elif stage_num == 4:
+            # Prep Badges — no scoring, returns 0 always
+            prep = PrepBadges(self.lcd, self.cfg, self.pm3)
+            try:
+                prep.run()
+            except Exception as exc:
+                logger.error(f"Prep Badges crashed: {exc}", exc_info=True)
+                self.lcd.clear()
+                self.lcd.write_line(0, "Prep error!")
+                self.lcd.write_line(1, "Check logs ◄")
+                time.sleep(3)
+            return 0
         else:
             return 0
 
