@@ -35,6 +35,7 @@ from subghz_handler import SubGHZHandler
 from flirc_handler import FlircHandler
 from ir_handler import IRHandler
 from database import Database
+from coffee_handler import CoffeeHandler
 
 # Configure logging
 logging.basicConfig(
@@ -58,6 +59,7 @@ class State:
     RFID_MENU = "RFID_MENU"
     SUBGHZ_MENU = "SUBGHZ_MENU"
     IR_MENU = "IR_MENU"
+    COFFEE_MENU = "COFFEE_MENU"
     CHALLENGE_ACTIVE = "CHALLENGE_ACTIVE"
     SUCCESS_SCREEN = "SUCCESS_SCREEN"
     FAIL_SCREEN = "FAIL_SCREEN"
@@ -81,14 +83,15 @@ class ZeroRange:
         self.subghz: Optional[SubGHZHandler] = None
         self.flirc: Optional[FlircHandler] = None
         self.ir: Optional[IRHandler] = None
+        self.coffee: Optional[CoffeeHandler] = None
         self.db: Optional[Database] = None
 
         self.current_state = State.HOME_SCREEN
         self.current_score = 0
 
         # Menu navigation
-        self.selected_menu_item = 0  # 0=iButton, 1=NFC, 2=RFID, 3=SubGHZ, 4=IR, 5=Settings
-        self.menu_items = ["iButton", "NFC", "RFID", "SubGHZ", "IR", "Settings"]
+        self.selected_menu_item = 0  # 0=iButton, 1=NFC, 2=RFID, 3=SubGHZ, 4=IR, 5=Coffee, 6=Settings
+        self.menu_items = ["iButton", "NFC", "RFID", "SubGHZ", "IR", "Coffee", "Settings"]
 
         # Sub-menu navigation (challenges 0-2)
         self.selected_ibutton_challenge = 0
@@ -179,6 +182,23 @@ class ZeroRange:
                 self.flirc = None
                 self.ir = None
 
+            # Initialize Coffee handler (always available, hardware checked per-stage)
+            logger.info("Initializing Coffee handler...")
+            try:
+                from app.web.routes.coffee import emit_event as _sse
+            except ImportError:
+                _sse = None
+            try:
+                self.coffee = CoffeeHandler(
+                    self.lcd, self.db,
+                    proxmark=self.proxmark,
+                    sse_emit=_sse,
+                )
+                logger.info("Coffee handler initialized")
+            except Exception as e:
+                logger.warning(f"Coffee handler initialization failed: {e}")
+                self.coffee = None
+
             self.lcd.clear()
             self.lcd.write_line(0, "ZeroRange v1.0")
             self.lcd.write_line(1, "Ready!          ")  # Pad with spaces to clear
@@ -255,7 +275,10 @@ class ZeroRange:
             elif self.selected_menu_item == 4:  # IR
                 logger.info("Entering IR menu")
                 self.current_state = State.IR_MENU
-            elif self.selected_menu_item == 5:  # Settings
+            elif self.selected_menu_item == 5:  # Coffee
+                logger.info("Entering Coffee menu")
+                self.current_state = State.COFFEE_MENU
+            elif self.selected_menu_item == 6:  # Settings
                 logger.info("Entering settings")
                 self.current_state = State.SETTINGS
 
@@ -437,6 +460,45 @@ class ZeroRange:
 
         # Return to RFID menu
         self.current_state = State.RFID_MENU
+
+    def display_coffee_menu(self):
+        """Display Coffee module entry screen"""
+        self.lcd.clear()
+        if self.coffee is None:
+            self.lcd.write_line(0, "Coffee N/A")
+            self.lcd.write_line(1, "L=Back")
+            return
+        score = self.coffee.get_module_score()
+        self.lcd.write_line(0, f"Coffee  {score}/30")
+        self.lcd.write_line(1, "SEL=Start L=Back")
+
+    def handle_coffee_menu(self):
+        """Handle Coffee module entry / launch"""
+        if self.coffee is None:
+            if self.lcd.button_pressed(5):
+                self.lcd.wait_button_release(5)
+                self.current_state = State.MAIN_MENU
+            return
+
+        if self.lcd.button_pressed(1):
+            self.lcd.wait_button_release(1)
+            logger.info("Starting Coffee module")
+            self.run_coffee()
+        elif self.lcd.button_pressed(5):
+            self.lcd.wait_button_release(5)
+            logger.info("Returning to main menu from Coffee")
+            self.current_state = State.MAIN_MENU
+
+    def run_coffee(self):
+        """Run the Coffee module (all stages, internal menu)."""
+        try:
+            pts = self.coffee.run()
+            if pts > 0:
+                self.current_score = self.db.get_total_score()
+                logger.info(f"Coffee module earned {pts} pts. Total: {self.current_score}")
+        except Exception as e:
+            logger.error(f"Error in Coffee module: {e}", exc_info=True)
+        self.current_state = State.COFFEE_MENU
 
     def display_settings(self):
         """Display settings menu"""
@@ -896,6 +958,12 @@ class ZeroRange:
                         self.handle_ir_menu()
                         time.sleep(0.1)
 
+                elif self.current_state == State.COFFEE_MENU:
+                    self.display_coffee_menu()
+                    while self.current_state == State.COFFEE_MENU:
+                        self.handle_coffee_menu()
+                        time.sleep(0.1)
+
                 elif self.current_state == State.SETTINGS:
                     self.display_settings()
                     while self.current_state == State.SETTINGS:
@@ -926,6 +994,9 @@ class ZeroRange:
 
             if self.ibutton:
                 self.ibutton.close()
+
+            if self.coffee:
+                self.coffee.close()
 
             if self.subghz:
                 self.subghz.close()

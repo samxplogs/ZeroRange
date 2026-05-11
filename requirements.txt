@@ -4,5 +4,12 @@
 # LCD dependencies (smbus2 for I2C communication)
 smbus2>=0.4.0
 
+# iButton USB HID reader (used by ibutton_usb_reader.py and coffee_handler.py)
+evdev>=1.6.1
+
+# Web companion (Flask + CORS)
+Flask==3.0.0
+flask-cors==4.0.0
+
 # Note: HackRF tools are system packages, not Python packages
 # Install with: sudo apt install hackrf libhackrf-dev rtl-433

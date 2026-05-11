@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" id="icon">
+  <title>Sam BrewMaster Pro — fictional coffee badge logo</title>
+  <!-- Mug body -->
+  <rect x="10" y="28" width="36" height="26" rx="4" ry="4"
+        fill="#ff6a00" opacity="0.15" stroke="#ff6a00" stroke-width="2"/>
+  <!-- Mug handle (key-bow silhouette) -->
+  <path d="M46 34 Q58 34 58 41 Q58 48 46 48" fill="none" stroke="#ff6a00" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- Key-bow circle on handle -->
+  <circle cx="54" cy="41" r="4" fill="none" stroke="#ff6a00" stroke-width="1.5"/>
+  <!-- Steam arc 1 (innermost) -->
+  <path d="M20 24 Q24 17 20 10" fill="none" stroke="#f4f1ec" stroke-width="1.8"
+        stroke-linecap="round" opacity="0.9">
+    <animate attributeName="opacity" values="0.9;0.3;0.9" dur="2s" repeatCount="indefinite"/>
+    <animate attributeName="d" values="M20 24 Q24 17 20 10;M20 26 Q25 19 21 12;M20 24 Q24 17 20 10"
+             dur="2s" repeatCount="indefinite"/>
+  </path>
+  <!-- Steam arc 2 (middle) -->
+  <path d="M28 22 Q32 14 28 7" fill="none" stroke="#f4f1ec" stroke-width="1.8"
+        stroke-linecap="round" opacity="0.7">
+    <animate attributeName="opacity" values="0.7;0.2;0.7" dur="2s" begin="0.4s" repeatCount="indefinite"/>
+    <animate attributeName="d" values="M28 22 Q32 14 28 7;M28 24 Q33 16 29 9;M28 22 Q32 14 28 7"
+             dur="2s" begin="0.4s" repeatCount="indefinite"/>
+  </path>
+  <!-- Steam arc 3 (outer — NFC-style) -->
+  <path d="M36 24 Q40 17 36 10" fill="none" stroke="#f4f1ec" stroke-width="1.8"
+        stroke-linecap="round" opacity="0.5">
+    <animate attributeName="opacity" values="0.5;0.1;0.5" dur="2s" begin="0.8s" repeatCount="indefinite"/>
+    <animate attributeName="d" values="M36 24 Q40 17 36 10;M36 26 Q41 19 37 12;M36 24 Q40 17 36 10"
+             dur="2s" begin="0.8s" repeatCount="indefinite"/>
+  </path>
+</svg>

@@ -1,0 +1,17 @@
+[Unit]
+Description=ZeroRange Web Companion
+After=network.target
+# Deliberately independent of zerorange.service — LCD must keep working if this crashes.
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/ZeroRange
+ExecStart=/usr/bin/python3 app/web/wsgi.py
+Restart=on-failure
+RestartSec=5s
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

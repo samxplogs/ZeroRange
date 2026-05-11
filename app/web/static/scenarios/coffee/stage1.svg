@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 160">
+  <title>Stage 1 — iButton technician token</title>
+  <style>
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+    text { font-family: monospace; fill: #f4f1ec; }
+  </style>
+
+  <!-- Background -->
+  <rect width="300" height="160" fill="#0e0e0e"/>
+
+  <!-- Lanyard line -->
+  <line x1="80" y1="0" x2="80" y2="55" stroke="#888" stroke-width="2" stroke-dasharray="4 3">
+    <animateTransform attributeName="transform" type="rotate"
+      values="-8 80 0; 8 80 0; -8 80 0" dur="1.6s" repeatCount="indefinite"/>
+  </line>
+
+  <!-- iButton fob (circular) -->
+  <g>
+    <animateTransform attributeName="transform" type="rotate"
+      values="-8 80 0; 8 80 0; -8 80 0" dur="1.6s" repeatCount="indefinite"/>
+    <circle cx="80" cy="70" r="22" fill="#222" stroke="#ff6a00" stroke-width="2.5"/>
+    <circle cx="80" cy="70" r="10" fill="#ff6a00" opacity="0.4"/>
+    <text x="80" y="75" text-anchor="middle" font-size="9" fill="#ff6a00">DS1990</text>
+  </g>
+
+  <!-- MAINT label on fob -->
+  <g>
+    <animateTransform attributeName="transform" type="rotate"
+      values="-8 80 0; 8 80 0; -8 80 0" dur="1.6s" repeatCount="indefinite"/>
+    <rect x="56" y="90" width="48" height="12" rx="2" fill="#ff6a00" opacity="0.8"/>
+    <text x="80" y="100" text-anchor="middle" font-size="8" fill="#0e0e0e" font-weight="bold">MAINT</text>
+  </g>
+
+  <!-- HID reader (right side) -->
+  <rect x="190" y="50" width="70" height="60" rx="6" fill="#1a1a1a" stroke="#555" stroke-width="1.5"/>
+  <circle cx="225" cy="80" r="20" fill="#111" stroke="#ff6a00" stroke-width="2"/>
+  <text x="225" y="100" text-anchor="middle" font-size="7" fill="#888">HID READER</text>
+
+  <!-- Contact pulse rings — appear when fob nears reader -->
+  <g opacity="0">
+    <animate attributeName="opacity" values="0;0;1;0;0" dur="1.6s" repeatCount="indefinite" begin="0.6s"/>
+    <circle cx="225" cy="80" r="24" fill="none" stroke="#ff6a00" stroke-width="1.5" opacity="0.7">
+      <animate attributeName="r" values="20;32;20" dur="0.6s" repeatCount="indefinite" begin="0.6s"/>
+      <animate attributeName="opacity" values="0.7;0;0.7" dur="0.6s" repeatCount="indefinite" begin="0.6s"/>
+    </circle>
+    <circle cx="225" cy="80" r="28" fill="none" stroke="#ff6a00" stroke-width="1" opacity="0.4">
+      <animate attributeName="r" values="24;38;24" dur="0.6s" repeatCount="indefinite" begin="0.7s"/>
+      <animate attributeName="opacity" values="0.4;0;0.4" dur="0.6s" repeatCount="indefinite" begin="0.7s"/>
+    </circle>
+  </g>
+
+  <!-- UID label -->
+  <text x="150" y="148" text-anchor="middle" font-size="9" fill="#ff6a00" opacity="0">
+    0100C0FFEE7E11AB
+    <animate attributeName="opacity" values="0;0;0;1;0" dur="1.6s" repeatCount="indefinite" begin="0.7s"/>
+  </text>
+</svg>

@@ -39,6 +39,17 @@
       "note": "RFID challenges coming in Phase 2"
     }
   },
+  "coffee": {
+    "technician_uid": "0100C0FFEE7E11AB",
+    "master_key_b_hex": "B4EEC0FFEE11",
+    "credit_threshold_cents": 5000,
+    "value_block_addr": 40,
+    "badge_paths": {
+      "low":  "challenges/coffee/badges/credit_low.nfc",
+      "high": "challenges/coffee/badges/credit_high.nfc"
+    },
+    "max_wrong_reads_stage1": 3
+  },
   "settings": {
     "log_level": "INFO",
     "auto_return_delay": 3,

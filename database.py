@@ -100,7 +100,11 @@ class Database:
                     # IR challenges (13-15)
                     (13, 'ir', 'Detect IR', 'Detect any IR signal', 10, 0, None),
                     (14, 'ir', 'Capture & Replay', 'Record and replay IR', 10, 0, None),
-                    (15, 'ir', 'Protocol Analysis', 'Identify IR protocol', 10, 0, None)
+                    (15, 'ir', 'Protocol Analysis', 'Identify IR protocol', 10, 0, None),
+                    # Coffee challenges (16-18)
+                    (16, 'coffee', 'Technician Token', 'Read maintenance iButton', 10, 0, None),
+                    (17, 'coffee', 'Crack & Dump', 'Dump badge via PM3 emulation', 10, 0, None),
+                    (18, 'coffee', 'Top Up Balance', 'Forge value block >=50 EUR', 10, 0, None)
                 ]
 
                 cursor.executemany("""
@@ -110,15 +114,15 @@ class Database:
 
                 self.conn.commit()
                 logger.info(f"Initialized {len(challenges)} challenges")
-            elif count < 15:
-                # Database exists but has fewer than 12 challenges - add missing ones
-                logger.info(f"Upgrading database from {count} to 15 challenges")
+            elif count < 18:
+                # Database exists but has fewer than 18 challenges - add missing ones
+                logger.info(f"Upgrading database from {count} to 18 challenges")
 
                 # Get existing challenge IDs
                 cursor.execute("SELECT id FROM challenges")
                 existing_ids = {row[0] for row in cursor.fetchall()}
 
-                # Define all 12 challenges
+                # Define all 18 challenges
                 all_challenges = [
                     (1, 'ibutton', 'Touch & Read', 'Detect any iButton', 10, 0, None),
                     (2, 'ibutton', 'Clone iButton', 'Read then emulate', 10, 0, None),
@@ -134,7 +138,10 @@ class Database:
                     (12, 'subghz', 'Signal Analysis', 'Analyze RF protocol', 10, 0, None),
                     (13, 'ir', 'Detect IR', 'Detect any IR signal', 10, 0, None),
                     (14, 'ir', 'Capture & Replay', 'Record and replay IR', 10, 0, None),
-                    (15, 'ir', 'Protocol Analysis', 'Identify IR protocol', 10, 0, None)
+                    (15, 'ir', 'Protocol Analysis', 'Identify IR protocol', 10, 0, None),
+                    (16, 'coffee', 'Technician Token', 'Read maintenance iButton', 10, 0, None),
+                    (17, 'coffee', 'Crack & Dump', 'Dump badge via PM3 emulation', 10, 0, None),
+                    (18, 'coffee', 'Top Up Balance', 'Forge value block >=50 EUR', 10, 0, None)
                 ]
 
                 # Add only missing challenges
@@ -148,7 +155,7 @@ class Database:
                     self.conn.commit()
                     logger.info(f"Added {len(missing_challenges)} new challenges")
             else:
-                logger.info(f"Database already contains {count} challenges (max: 15)")
+                logger.info(f"Database already contains {count} challenges (max: 18)")
 
         except Exception as e:
             logger.error(f"Failed to initialize database: {e}")

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Coffee — Sam BrewMaster Pro | ZeroRange</title>
+<style>
+:root {
+  --bg: #0e0e0e;
+  --fg: #f4f1ec;
+  --accent: #ff6a00;
+  --green: #39d353;
+  --red: #f85149;
+  --dim: #666;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: monospace;
+  min-height: 100vh;
+  padding: 1.5rem;
+}
+header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+header svg { width: 48px; height: 48px; }
+header h1 { color: var(--accent); font-size: 1.3rem; letter-spacing: .08em; }
+header p { font-size: .75rem; color: var(--dim); margin-top: .3rem; }
+
+.stages { display: flex; flex-direction: column; gap: 1.5rem; }
+.stage {
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1rem;
+  transition: border-color .3s;
+}
+.stage.active  { border-color: var(--accent); }
+.stage.success { border-color: var(--green); }
+.stage.fail    { border-color: var(--red); }
+
+.stage h2 { font-size: .9rem; color: var(--fg); margin-bottom: .5rem; display: flex; justify-content: space-between; }
+.badge { font-size: .7rem; padding: .2rem .5rem; border-radius: 3px; background: #1a1a1a; }
+.badge.ok   { color: var(--green); }
+.badge.fail { color: var(--red); }
+.badge.wait { color: var(--dim); }
+
+.animation { width: 100%; max-width: 300px; margin: .75rem auto; display: block; }
+
+.credit-counter {
+  font-size: 2rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .05em;
+  text-align: center;
+  margin: 1rem 0;
+  font-feature-settings: "tnum";
+}
+.credit-counter.ok   { color: var(--green); }
+.credit-counter.low  { color: var(--red); }
+.credit-counter.idle { color: var(--dim); }
+
+.error-banner {
+  background: #2a0a0a;
+  border: 1px solid var(--red);
+  border-radius: 4px;
+  padding: .5rem 1rem;
+  font-size: .8rem;
+  color: var(--red);
+  margin-top: .5rem;
+  display: none;
+}
+.error-banner.show { display: block; }
+
+footer { margin-top: 2rem; font-size: .7rem; color: var(--dim); }
+a { color: var(--accent); }
+
+/* prefers-reduced-motion fallback */
+@media (prefers-reduced-motion: reduce) {
+  .animation * { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <img src="/scenarios/coffee/static/scenarios/coffee/logo.svg" alt="Coffee logo" width="48" height="48">
+  <div>
+    <h1>Sam BrewMaster Pro</h1>
+    <p>FICTIONAL brand · ZeroRange training module · 30 pts</p>
+  </div>
+</header>
+
+<div class="stages">
+
+  <!-- Stage 1 -->
+  <div class="stage" id="stage1">
+    <h2>
+      Stage 1 — Technician Token
+      <span class="badge wait" id="badge1">waiting</span>
+    </h2>
+    <img class="animation" id="anim1"
+         src="/scenarios/coffee/static/scenarios/coffee/stage1.svg"
+         alt="iButton animation">
+  </div>
+
+  <!-- Stage 2 -->
+  <div class="stage" id="stage2">
+    <h2>
+      Stage 2 — Crack &amp; Dump Badge
+      <span class="badge wait" id="badge2">waiting</span>
+    </h2>
+    <img class="animation" id="anim2"
+         src="/scenarios/coffee/static/scenarios/coffee/stage2.svg"
+         alt="Badge dump animation">
+  </div>
+
+  <!-- Stage 3 -->
+  <div class="stage" id="stage3">
+    <h2>
+      Stage 3 — Top Up Balance
+      <span class="badge wait" id="badge3">waiting</span>
+    </h2>
+    <div class="credit-counter idle" id="creditDisplay">–,– EUR</div>
+    <div class="error-banner" id="errorBanner"></div>
+    <img class="animation" id="anim3"
+         src="/scenarios/coffee/static/scenarios/coffee/stage3.svg"
+         alt="Top-up animation">
+  </div>
+
+</div>
+
+<footer>
+  Sam BrewMaster Pro is entirely fictional. No real hardware is targeted.
+  <br><a href="/">← Back to scenarios</a>
+</footer>
+
+<script>
+const evtSource = new EventSource('/scenarios/coffee/events');
+
+function setStage(n, status) {
+  const el = document.getElementById('stage' + n);
+  const badge = document.getElementById('badge' + n);
+  el.classList.remove('active','success','fail');
+  badge.classList.remove('ok','fail','wait');
+  if (status === 'success') {
+    el.classList.add('success');
+    badge.classList.add('ok');
+    badge.textContent = '✓ done';
+  } else if (status === 'active') {
+    el.classList.add('active');
+    badge.classList.add('wait');
+    badge.textContent = 'active';
+  } else if (status === 'fail') {
+    el.classList.add('fail');
+    badge.classList.add('fail');
+    badge.textContent = 'failed';
+  }
+}
+
+function formatCents(cents) {
+  if (cents == null) return '–,– EUR';
+  const eur = Math.floor(cents / 100);
+  const ct  = String(Math.abs(cents % 100)).padStart(2,'0');
+  return `${eur},${ct} EUR`;
+}
+
+evtSource.onmessage = function(e) {
+  let data;
+  try { data = JSON.parse(e.data); } catch { return; }
+
+  if (data.event === 'connected') return;
+
+  // Stage success transitions
+  if (data.stage && data.status === 'success') {
+    setStage(data.stage, 'success');
+  }
+
+  // Stage 3 credit read-back
+  if (data.event === 'credit_observed') {
+    const display = document.getElementById('creditDisplay');
+    const banner  = document.getElementById('errorBanner');
+    const cents   = data.value_cents;
+
+    display.textContent = formatCents(cents);
+    display.classList.remove('ok','low','idle');
+
+    if (data.error) {
+      banner.textContent = data.error;
+      banner.classList.add('show');
+      display.classList.add('low');
+    } else if (cents != null && cents >= 5000) {
+      display.classList.add('ok');
+      banner.classList.remove('show');
+    } else {
+      display.classList.add('low');
+      banner.textContent = cents != null ? `Value too low: ${formatCents(cents)}` : 'Read failed';
+      banner.classList.add('show');
+    }
+  }
+};
+
+evtSource.onerror = function() {
+  console.warn('SSE connection lost, reconnecting...');
+};
+</script>
+</body>
+</html>

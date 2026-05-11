@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 160">
+  <title>Stage 2 — employee badge card reading</title>
+  <style>
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+    text { font-family: monospace; }
+  </style>
+
+  <rect width="300" height="160" fill="#0e0e0e"/>
+
+  <!-- Coffee machine body (side view) -->
+  <rect x="10" y="30" width="90" height="110" rx="6" fill="#1a1a1a" stroke="#555" stroke-width="1.5"/>
+  <rect x="20" y="40" width="70" height="40" rx="3" fill="#111" stroke="#333"/>
+  <!-- Card slot -->
+  <rect x="20" y="90" width="70" height="8" rx="1" fill="#0e0e0e" stroke="#ff6a00" stroke-width="1"/>
+  <text x="55" y="98" text-anchor="middle" font-size="6" fill="#ff6a00">CARD SLOT</text>
+
+  <!-- Employee card sliding in -->
+  <rect id="card" x="100" y="87" width="40" height="14" rx="2" fill="#ff6a00" opacity="0.9">
+    <animate attributeName="x" values="100;50;50;100" dur="2.4s" repeatCount="indefinite"/>
+  </rect>
+  <text x="120" y="98" text-anchor="middle" font-size="6" fill="#0e0e0e" font-weight="bold">
+    EMPLOYEE
+    <animate attributeName="x" values="120;70;70;120" dur="2.4s" repeatCount="indefinite"/>
+  </text>
+
+  <!-- Hex bytes cascading out -->
+  <g>
+    <text x="120" y="50" font-size="7" fill="#39d353" opacity="0">
+      B4 EE C0 FF EE 11
+      <animate attributeName="opacity" values="0;0;1;0.6;0" dur="2.4s" repeatCount="indefinite" begin="0.8s"/>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -20; 0 -20; 0 0" dur="2.4s" repeatCount="indefinite" begin="0.8s"/>
+    </text>
+    <text x="130" y="65" font-size="7" fill="#39d353" opacity="0">
+      FF FF FF FF FF FF
+      <animate attributeName="opacity" values="0;0;0.8;0.3;0" dur="2.4s" repeatCount="indefinite" begin="1.0s"/>
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -18; 0 -18; 0 0" dur="2.4s" repeatCount="indefinite" begin="1.0s"/>
+    </text>
+  </g>
+
+  <!-- Sector padlocks (8-14) unlocking one by one -->
+  <g transform="translate(200,20)">
+    <text x="0" y="12" font-size="8" fill="#f4f1ec">Sectors 8-14</text>
+    <!-- Seven padlock glyphs -->
+    <g id="locks">
+      <text x="0"  y="30" font-size="10" fill="#ff6a00">🔒</text>
+      <text x="14" y="30" font-size="10" fill="#ff6a00">🔒</text>
+      <text x="28" y="30" font-size="10" fill="#ff6a00">🔒</text>
+      <text x="42" y="30" font-size="10" fill="#ff6a00">🔒</text>
+      <text x="56" y="30" font-size="10" fill="#ff6a00">🔒</text>
+      <text x="70" y="30" font-size="10" fill="#ff6a00">🔒</text>
+      <text x="84" y="30" font-size="10" fill="#ff6a00">🔒</text>
+    </g>
+    <g>
+      <text x="0"  y="30" font-size="10" fill="#39d353" opacity="0">🔓
+        <animate attributeName="opacity" values="0;0;0;1" dur="2.4s" begin="0.4s" repeatCount="indefinite"/>
+      </text>
+      <text x="14" y="30" font-size="10" fill="#39d353" opacity="0">🔓
+        <animate attributeName="opacity" values="0;0;0;1" dur="2.4s" begin="0.6s" repeatCount="indefinite"/>
+      </text>
+      <text x="28" y="30" font-size="10" fill="#39d353" opacity="0">🔓
+        <animate attributeName="opacity" values="0;0;0;1" dur="2.4s" begin="0.8s" repeatCount="indefinite"/>
+      </text>
+      <text x="42" y="30" font-size="10" fill="#39d353" opacity="0">🔓
+        <animate attributeName="opacity" values="0;0;0;1" dur="2.4s" begin="1.0s" repeatCount="indefinite"/>
+      </text>
+      <text x="56" y="30" font-size="10" fill="#39d353" opacity="0">🔓
+        <animate attributeName="opacity" values="0;0;0;1" dur="2.4s" begin="1.2s" repeatCount="indefinite"/>
+      </text>
+      <text x="70" y="30" font-size="10" fill="#39d353" opacity="0">🔓
+        <animate attributeName="opacity" values="0;0;0;1" dur="2.4s" begin="1.4s" repeatCount="indefinite"/>
+      </text>
+      <text x="84" y="30" font-size="10" fill="#39d353" opacity="0">🔓
+        <animate attributeName="opacity" values="0;0;0;1" dur="2.4s" begin="1.6s" repeatCount="indefinite"/>
+      </text>
+    </g>
+  </g>
+</svg>

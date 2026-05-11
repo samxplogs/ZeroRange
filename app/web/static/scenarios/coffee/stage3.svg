@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 160" id="stage3-anim">
+  <title>Stage 3 — credit top-up counter</title>
+  <style>
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+    .digit { font-family: monospace; font-size: 28px; font-weight: bold; fill: #ff6a00; }
+    .label { font-family: monospace; font-size: 10px; fill: #888; }
+    .bean  { font-size: 18px; }
+    .cup   { font-size: 40px; }
+  </style>
+
+  <rect width="300" height="160" fill="#0e0e0e"/>
+
+  <!-- Espresso cup icon -->
+  <text class="cup" x="20" y="90">☕</text>
+
+  <!-- Coffee fill animation (rising liquid inside cup) -->
+  <clipPath id="fillClip">
+    <rect x="22" y="120" width="36" height="0">
+      <animate attributeName="height" values="0;40;40;0" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="y" values="120;80;80;120" dur="3s" repeatCount="indefinite"/>
+    </rect>
+  </clipPath>
+  <rect x="22" y="60" width="36" height="60" fill="#ff6a00" opacity="0.35" clip-path="url(#fillClip)"/>
+
+  <!-- Credit counter (tick-style: discrete digit slots) -->
+  <g transform="translate(80, 100)">
+    <text class="label" x="0" y="-45" text-anchor="left">CREDIT BALANCE</text>
+
+    <!-- Digit slots that tick -->
+    <!-- Ones of EUR (0→50) — just static placeholder; JS controls real value -->
+    <rect x="0"  y="-35" width="22" height="32" rx="3" fill="#1a1a1a" stroke="#333"/>
+    <rect x="26" y="-35" width="22" height="32" rx="3" fill="#1a1a1a" stroke="#333"/>
+    <text class="digit" x="6"  y="-9">0</text>
+    <text class="digit" x="32" y="-9">
+      <animate attributeName="textContent" values="1;5;1" dur="3s" repeatCount="indefinite"
+               calcMode="discrete"/>
+    </text>
+
+    <text class="digit" x="52" y="-9" fill="#f4f1ec">,</text>
+
+    <rect x="62" y="-35" width="22" height="32" rx="3" fill="#1a1a1a" stroke="#333"/>
+    <rect x="88" y="-35" width="22" height="32" rx="3" fill="#1a1a1a" stroke="#333"/>
+    <text class="digit" x="68" y="-9">
+      <animate attributeName="textContent" values="4;0;4" dur="3s" repeatCount="indefinite"
+               calcMode="discrete"/>
+    </text>
+    <text class="digit" x="94" y="-9">
+      <animate attributeName="textContent" values="0;0;0" dur="3s" repeatCount="indefinite"
+               calcMode="discrete"/>
+    </text>
+
+    <text class="digit" x="115" y="-9" fill="#f4f1ec" font-size="16"> EUR</text>
+  </g>
+
+  <!-- Coffee bean confetti (success) -->
+  <g opacity="0">
+    <animate attributeName="opacity" values="0;0;0;1;1;0" dur="3s" repeatCount="indefinite" begin="2.2s"/>
+    <text class="bean" x="180" y="40">
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; -10 -20; 10 -30" dur="0.8s" repeatCount="indefinite" begin="2.2s"/>
+      ☕
+    </text>
+    <text class="bean" x="220" y="45">
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 12 -25; -5 -15" dur="0.8s" repeatCount="indefinite" begin="2.4s"/>
+      ☕
+    </text>
+    <text class="bean" x="200" y="50">
+      <animateTransform attributeName="transform" type="translate"
+        values="0 0; 0 -30; 8 -10" dur="0.8s" repeatCount="indefinite" begin="2.6s"/>
+      ☕
+    </text>
+  </g>
+</svg>

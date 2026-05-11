@@ -6,9 +6,12 @@ Interface avec le Proxmark3 pour NFC et RFID
 
 import subprocess
 import re
+import tempfile
+import threading
 import time
 import logging
-from typing import Optional, Dict, List, Tuple
+from pathlib import Path
+from typing import Optional, Dict, Iterable, List, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -329,6 +332,155 @@ class ProxmarkHandler:
                 return version_match.group(1).strip()
 
         return None
+
+    # ==================== Coffee module extensions ====================
+
+    def emulate_mfc_from_file(self, nfc_path: Path) -> "EmulationHandle":
+        """Start a MIFARE Classic 1K emulation from a Flipper .nfc file.
+
+        Converts the file to a Proxmark3 .eml in a temp dir, loads it with
+        hf mf eload, then starts hf mf sim.  Returns an EmulationHandle
+        whose stop() terminates the simulation and cleans up.
+        """
+        from challenges.coffee.nfc_to_pm3_eml import parse_nfc, blocks_to_eml
+
+        blocks = parse_nfc(nfc_path)
+        eml_text = blocks_to_eml(blocks)
+
+        tmp_dir = tempfile.mkdtemp(prefix="zr_coffee_")
+        eml_file = Path(tmp_dir) / "badge.eml"
+        eml_file.write_text(eml_text, encoding="utf-8")
+
+        # Load the card image
+        logger.info(f"Loading badge image from {eml_file}")
+        ok, out = self.run_command(f"hf mf eload -f {eml_file}", timeout=15)
+        if not ok and "not found" not in out.lower():
+            # Some PM3 versions accept the command silently; log but continue
+            logger.warning(f"hf mf eload returned non-zero: {out[:200]}")
+
+        return EmulationHandle(self, eml_file)
+
+    def read_block(self, block: int, key: bytes, key_type: str = "B") -> bytes:
+        """Read a single 16-byte MIFARE Classic block.
+
+        Args:
+            block:    Block number (0-63).
+            key:      6-byte authentication key.
+            key_type: 'A' or 'B'.
+
+        Returns:
+            16 raw bytes.
+
+        Raises:
+            ProxmarkAuthError: when the card rejects the key.
+            ProxmarkReadError: on other failures.
+        """
+        key_hex = key.hex().upper()
+        command = f"hf mf rdbl --blk {block} --{key_type.lower()} --key {key_hex}"
+        success, output = self.run_command(command, timeout=8)
+
+        if not success:
+            # Older PM3 CLI syntax
+            command = f"hf mf rdbl {block} {key_type.upper()} {key_hex}"
+            success, output = self.run_command(command, timeout=8)
+
+        if "auth" in output.lower() and "fail" in output.lower():
+            raise ProxmarkAuthError(f"Block {block} auth failed with key {key_hex}")
+
+        # Parse hex data from output
+        m = re.search(r"(?:data|block)\s*[:\|]\s*([0-9a-fA-F\s]{32,47})", output, re.IGNORECASE)
+        if m:
+            raw = bytes.fromhex(m.group(1).replace(" ", ""))
+            if len(raw) == 16:
+                return raw
+
+        # Try plain 32-hex-char line
+        for line in output.splitlines():
+            cleaned = line.strip().replace(" ", "")
+            if len(cleaned) == 32 and all(c in "0123456789abcdefABCDEF" for c in cleaned):
+                return bytes.fromhex(cleaned)
+
+        raise ProxmarkReadError(f"Could not parse block {block} data from: {output[:200]}")
+
+
+class ProxmarkAuthError(RuntimeError):
+    """PM3 authentication failure."""
+
+
+class ProxmarkReadError(RuntimeError):
+    """PM3 read failure (not auth-related)."""
+
+
+class EmulationHandle:
+    """Context for an active hf mf sim emulation session."""
+
+    def __init__(self, pm3: "ProxmarkHandler", eml_file: Path):
+        self._pm3 = pm3
+        self._eml_file = eml_file
+        self._log_lines: List[str] = []
+        self._proc: Optional[subprocess.Popen] = None
+        self._reader_thread: Optional[threading.Thread] = None
+        self._running = False
+        self._start()
+
+    def _start(self) -> None:
+        cmd = [
+            self._pm3.client_path,
+            self._pm3.port,
+            "-c",
+            "hf mf sim",
+        ]
+        try:
+            self._proc = subprocess.Popen(
+                cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+            self._running = True
+            self._reader_thread = threading.Thread(
+                target=self._read_output, daemon=True
+            )
+            self._reader_thread.start()
+            logger.info("PM3 MFC emulation started")
+        except Exception as exc:
+            logger.error(f"Failed to start PM3 emulation process: {exc}")
+            raise
+
+    def _read_output(self) -> None:
+        try:
+            assert self._proc and self._proc.stdout
+            for line in self._proc.stdout:
+                self._log_lines.append(line.rstrip())
+                logger.debug(f"PM3 sim: {line.rstrip()}")
+        except Exception:
+            pass
+
+    def read_log_lines(self) -> List[str]:
+        """Return accumulated log lines from the emulation process."""
+        return list(self._log_lines)
+
+    def stop(self) -> None:
+        """Terminate the emulation and clean up temp files."""
+        self._running = False
+        if self._proc is not None:
+            try:
+                self._proc.terminate()
+                self._proc.wait(timeout=5)
+            except Exception:
+                try:
+                    self._proc.kill()
+                except Exception:
+                    pass
+            self._proc = None
+            logger.info("PM3 MFC emulation stopped")
+
+        # Clean up temp eml
+        try:
+            self._eml_file.unlink(missing_ok=True)
+            self._eml_file.parent.rmdir()
+        except Exception:
+            pass
 
 
 # Test code

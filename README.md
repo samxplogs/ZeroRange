@@ -66,8 +66,9 @@ Navigate through challenges using the 5-button interface:
 | **NFC** | Detect, Clone, MIFARE Attack | 30 pts | Available |
 | **RFID** | Detect, Clone, Simulate | 30 pts | Available |
 | **SubGHZ** | Detect Signal, Record & Replay, Signal Analysis | 30 pts | Available |
+| **Coffee** | Technician Token, Dump & Crack, Top Up | 30 pts | Available |
 
-**Total: 120 points** across 12 challenges
+**Total: 150 points** across 15 challenges
 
 ### Coming Soon
 
@@ -259,6 +260,16 @@ ZeroRange/
 ├── SUBGHZ_INTEGRATION.md # SubGHZ setup guide
 └── docs/                 # Web documentation
 ```
+
+---
+
+## Coffee Module Disclaimer
+
+**Sam BrewMaster Pro** is an entirely fictional brand created for ZeroRange.
+Any resemblance to real coffee/vending badge systems, manufacturers, or deployments
+is **purely coincidental**. The Coffee module exists for hands-on security training
+in a controlled environment only. The badge keys, UIDs, and card data used are
+synthetic and do not target any real-world hardware or deployment.
 
 ---
 
