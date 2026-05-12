@@ -39,6 +39,26 @@
       "note": "RFID challenges coming in Phase 2"
     }
   },
+  "garage": {
+    "rolling": {
+      "device_id_hex": "DE AD BE EF",
+      "seed_hex":      "C0 FF EE 11",
+      "freq_hz":       433920000,
+      "modulation":    "OOK",
+      "symbol_us":     250,
+      "press_gap_ms":  1500,
+      "counter_window": 16,
+      "initial_counter": 100
+    },
+    "pedestrian_uid":      "REPLACE_WITH_DS1990_UID",
+    "tech_room_key_a_hex": "F15EC0DE0017",
+    "badge_path":  "challenges/garage/badges/tech_room.nfc",
+    "signal_paths": {
+      "press_N":        "challenges/garage/signals/press_N.sub",
+      "press_N_plus_1": "challenges/garage/signals/press_N_plus_1.sub"
+    },
+    "max_wrong_reads_stage2": 3
+  },
   "coffee": {
     "technician_uid": "0100C0FFEE7E11AB",
     "master_key_b_hex": "B4EEC0FFEE11",

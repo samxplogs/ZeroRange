@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Garage — Sam Garage | ZeroRange</title>
+<style>
+:root {
+  --bg: #0e0e0e;
+  --fg: #d8d3c8;
+  --accent: #ff6a00;
+  --green: #39d353;
+  --red: #e23a3a;
+  --dim: #555;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: monospace;
+  min-height: 100vh;
+  padding: 1.5rem;
+}
+header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+header img { width: 48px; height: 48px; }
+header h1 { color: var(--accent); font-size: 1.3rem; letter-spacing: .08em; }
+header p  { font-size: .75rem; color: var(--dim); margin-top: .3rem; }
+
+.stages { display: flex; flex-direction: column; gap: 1.5rem; }
+.stage {
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 1rem;
+  transition: border-color .3s;
+}
+.stage.active  { border-color: var(--accent); }
+.stage.success { border-color: var(--green); }
+.stage.fail    { border-color: var(--red); }
+
+.stage h2 {
+  font-size: .9rem;
+  color: var(--fg);
+  margin-bottom: .5rem;
+  display: flex;
+  justify-content: space-between;
+}
+.badge { font-size: .7rem; padding: .2rem .5rem; border-radius: 3px; background: #1a1a1a; }
+.badge.ok   { color: var(--green); }
+.badge.fail { color: var(--red); }
+.badge.wait { color: var(--dim); }
+
+.animation { width: 100%; max-width: 300px; margin: .75rem auto; display: block; }
+
+/* ── Stage 1 live display ── */
+#s1-counter {
+  font-size: 1.8rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .12em;
+  text-align: center;
+  margin: .5rem 0;
+  font-feature-settings: "tnum";
+  color: var(--fg);
+  transition: color .15s;
+}
+#s1-counter.tick { color: var(--accent); }
+
+.s1-state-row {
+  display: flex;
+  gap: .8rem;
+  font-size: .75rem;
+  color: var(--dim);
+  margin-bottom: .5rem;
+}
+.s1-state-row span { padding: .15rem .4rem; border: 1px solid #333; border-radius: 3px; }
+.s1-state-row span.lit { color: var(--accent); border-color: var(--accent); }
+
+.tray {
+  display: flex;
+  gap: .4rem;
+  margin: .3rem 0;
+  font-size: .75rem;
+  color: var(--dim);
+}
+.tray-slot {
+  width: 24px; height: 24px;
+  border: 1px solid #333;
+  border-radius: 3px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .6rem;
+  transition: border-color .2s, color .2s;
+}
+.tray-slot.held { border-color: var(--accent); color: var(--accent); }
+
+/* REJECT / OPEN banners */
+.banner {
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: center;
+  padding: .3rem;
+  border-radius: 4px;
+  margin: .4rem 0;
+  display: none;
+}
+.banner.reject { background: #2a0a0a; color: var(--red);   border: 1px solid var(--red); }
+.banner.open   { background: #0a2a0a; color: var(--green); border: 1px solid var(--green); }
+.banner.show   { display: block; }
+
+/* ── Debug panel ── */
+#debug-toggle {
+  font-size: .7rem;
+  color: var(--dim);
+  cursor: pointer;
+  user-select: none;
+  margin-top: .5rem;
+  display: inline-block;
+}
+#debug-toggle:hover { color: var(--fg); }
+#debug-panel {
+  display: none;
+  margin-top: .5rem;
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: .75rem;
+  font-size: .75rem;
+  color: var(--dim);
+}
+#debug-panel.show { display: block; }
+#debug-panel table { width: 100%; border-collapse: collapse; }
+#debug-panel td { padding: .15rem .4rem; }
+#debug-panel td:first-child { color: var(--dim); }
+#debug-panel td:last-child  { color: var(--fg); font-variant-numeric: tabular-nums; }
+#debug-send-btn {
+  margin-top: .5rem;
+  padding: .3rem .8rem;
+  background: #1a1a1a;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-family: monospace;
+  font-size: .75rem;
+  cursor: pointer;
+  border-radius: 3px;
+}
+#debug-send-btn:hover { background: #2a1a0a; }
+
+footer { margin-top: 2rem; font-size: .7rem; color: var(--dim); }
+a { color: var(--accent); }
+
+@media (prefers-reduced-motion: reduce) {
+  .animation * { animation: none !important; transition: none !important; }
+  #s1-counter.tick { color: var(--fg); }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <img src="/scenarios/garage/static/scenarios/garage/logo.svg" alt="Garage logo" width="48" height="48">
+  <div>
+    <h1>Sam Garage</h1>
+    <p>FICTIONAL facility · ZeroRange training module · 30 pts</p>
+  </div>
+</header>
+
+<div class="stages">
+
+  <!-- Stage 1 — Rolling Code -->
+  <div class="stage" id="stage1">
+    <h2>
+      Stage 1 — Rolling Code
+      <span class="badge wait" id="badge1">waiting</span>
+    </h2>
+
+    <!-- Live rolling counter -->
+    <div class="s1-state-row">
+      <span id="s1-jam-badge">JAM: off</span>
+      <span id="s1-window">win: 16</span>
+      <span id="s1-last-accepted">last: —</span>
+    </div>
+    <div id="s1-counter">——</div>
+
+    <!-- Tray (captured frames) -->
+    <div class="tray">
+      <span>TRAY:</span>
+      <div class="tray-slot" id="tray-0">—</div>
+      <div class="tray-slot" id="tray-1">—</div>
+    </div>
+
+    <!-- Outcome banners -->
+    <div class="banner reject" id="reject-banner">✗ REPLAY REJECTED</div>
+    <div class="banner open"   id="open-banner">✓ GATE OPEN</div>
+
+    <img class="animation" id="anim1"
+         src="/scenarios/garage/static/scenarios/garage/stage1.svg"
+         alt="Rolling-code animation">
+
+    <!-- Debug panel -->
+    <span id="debug-toggle">[DEBUG] ▸</span>
+    <div id="debug-panel">
+      <table>
+        <tr><td>last_accepted</td><td id="dbg-last">—</td></tr>
+        <tr><td>window</td><td id="dbg-window">16</td></tr>
+        <tr><td>tray_size</td><td id="dbg-tray">0</td></tr>
+        <tr><td>jammed</td><td id="dbg-jammed">false</td></tr>
+      </table>
+      <button id="debug-send-btn">▶ Send press</button>
+    </div>
+  </div>
+
+  <!-- Stage 2 — Pedestrian Gate -->
+  <div class="stage" id="stage2">
+    <h2>
+      Stage 2 — Pedestrian Gate
+      <span class="badge wait" id="badge2">waiting</span>
+    </h2>
+    <img class="animation" id="anim2"
+         src="/scenarios/garage/static/scenarios/garage/stage2.svg"
+         alt="Gate animation">
+  </div>
+
+  <!-- Stage 3 — Tech Room -->
+  <div class="stage" id="stage3">
+    <h2>
+      Stage 3 — Tech Room
+      <span class="badge wait" id="badge3">waiting</span>
+    </h2>
+    <img class="animation" id="anim3"
+         src="/scenarios/garage/static/scenarios/garage/stage3.svg"
+         alt="Tech room animation">
+  </div>
+
+</div>
+
+<footer>
+  Sam Garage is entirely fictional. No real hardware is targeted.<br>
+  TX power is at the minimum practical level. User is responsible for local regulations.<br>
+  <a href="/">← Back to scenarios</a>
+</footer>
+
+<script>
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function setStage(n, status) {
+  const el    = document.getElementById('stage' + n);
+  const badge = document.getElementById('badge' + n);
+  el.classList.remove('active', 'success', 'fail');
+  badge.classList.remove('ok', 'fail', 'wait');
+  if (status === 'success') {
+    el.classList.add('success');
+    badge.classList.add('ok');
+    badge.textContent = '✓ done';
+  } else if (status === 'active') {
+    el.classList.add('active');
+    badge.classList.add('wait');
+    badge.textContent = 'active';
+  } else if (status === 'fail') {
+    el.classList.add('fail');
+    badge.classList.add('fail');
+    badge.textContent = 'failed';
+  }
+}
+
+// ── State ─────────────────────────────────────────────────────────────────────
+
+let s1LastAccepted = null;
+let s1Window = 16;
+let s1Tray = 0;
+let s1Jammed = false;
+
+function updateDebug() {
+  document.getElementById('dbg-last').textContent    = s1LastAccepted ?? '—';
+  document.getElementById('dbg-window').textContent  = s1Window;
+  document.getElementById('dbg-tray').textContent    = s1Tray;
+  document.getElementById('dbg-jammed').textContent  = s1Jammed;
+  document.getElementById('s1-window').textContent   = 'win: ' + s1Window;
+  document.getElementById('s1-last-accepted').textContent = 'last: ' + (s1LastAccepted ?? '—');
+  const jamEl = document.getElementById('s1-jam-badge');
+  jamEl.textContent = 'JAM: ' + (s1Jammed ? 'ON' : 'off');
+  jamEl.className   = s1Jammed ? 'lit' : '';
+}
+
+function tickCounter(val) {
+  const el = document.getElementById('s1-counter');
+  el.textContent = String(val).padStart(4, '0');
+  el.classList.add('tick');
+  setTimeout(() => el.classList.remove('tick'), 200);
+}
+
+function flashBanner(id, duration) {
+  const el = document.getElementById(id);
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), duration || 2500);
+}
+
+function updateTray(size) {
+  s1Tray = size;
+  for (let i = 0; i < 2; i++) {
+    const slot = document.getElementById('tray-' + i);
+    if (i < size) {
+      slot.classList.add('held');
+      slot.textContent = '✓';
+    } else {
+      slot.classList.remove('held');
+      slot.textContent = '—';
+    }
+  }
+}
+
+// ── SSE ───────────────────────────────────────────────────────────────────────
+
+const evtSource = new EventSource('/scenarios/garage/events');
+
+evtSource.onmessage = function(e) {
+  let data;
+  try { data = JSON.parse(e.data); } catch { return; }
+  if (data.event === 'connected') return;
+
+  // Stage success
+  if (data.stage && data.status === 'success') {
+    setStage(data.stage, 'success');
+  }
+
+  switch (data.event) {
+    case 'press_emitted':
+      setStage(1, 'active');
+      tickCounter(data.counter);
+      break;
+
+    case 'jam_started':
+      s1Jammed = true;
+      updateDebug();
+      break;
+
+    case 'frame_held':
+      updateTray(data.tray_size);
+      updateDebug();
+      break;
+
+    case 'replay_received':
+      if (data.accepted) {
+        flashBanner('open-banner', 3000);
+      } else {
+        flashBanner('reject-banner', 2500);
+      }
+      break;
+
+    case 'window_slid':
+      s1LastAccepted = data.last_accepted;
+      s1Window = data.window;
+      s1Jammed = false;
+      updateDebug();
+      tickCounter(data.last_accepted);
+      break;
+
+    case 'stage_complete':
+      if (data.stage === 1 || data.stage === '1a' || data.stage === '1b') {
+        setStage(1, 'success');
+      } else if (data.stage === 2) {
+        setStage(2, 'success');
+      } else if (data.stage === 3) {
+        setStage(3, 'success');
+      }
+      break;
+
+    case 'key_leaked':
+      // Stage 2 post-it leak — already in SVG animation; nothing extra needed
+      break;
+  }
+};
+
+evtSource.onerror = function() {
+  console.warn('SSE connection lost, reconnecting...');
+};
+
+// ── Debug panel toggle ────────────────────────────────────────────────────────
+
+document.getElementById('debug-toggle').addEventListener('click', function() {
+  const panel = document.getElementById('debug-panel');
+  panel.classList.toggle('show');
+  this.textContent = panel.classList.contains('show') ? '[DEBUG] ▾' : '[DEBUG] ▸';
+});
+
+document.getElementById('debug-send-btn').addEventListener('click', function() {
+  fetch('/scenarios/garage/debug/send-press', { method: 'POST' })
+    .catch(() => {});
+});
+</script>
+</body>
+</html>

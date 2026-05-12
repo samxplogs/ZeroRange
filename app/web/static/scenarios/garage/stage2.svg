@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 180">
+<style>
+/* Gate swing animation */
+#gate { transform-origin: 60px 40px; animation: swing-gate 2.5s ease-in-out infinite; }
+@keyframes swing-gate {
+  0%,40%  { transform: rotate(0deg); }
+  60%,100%{ transform: rotate(-75deg); }
+}
+
+/* Fob tap pulse */
+.pulse-ring { transform-origin: 220px 100px; animation: pulse 2.5s ease-out infinite; }
+.pulse-ring:nth-child(2) { animation-delay: .4s; }
+.pulse-ring:nth-child(3) { animation-delay: .8s; }
+@keyframes pulse {
+  0%   { r: 12; opacity: .8; }
+  100% { r: 30; opacity: 0; }
+}
+
+/* Post-it slide up */
+#postit { transform: translateY(60px); opacity: 0; animation: postit-up 2.5s 1.5s ease forwards infinite; }
+@keyframes postit-up {
+  0%  { transform: translateY(60px); opacity: 0; }
+  20% { transform: translateY(0);    opacity: 1; }
+  80% { transform: translateY(0);    opacity: 1; }
+  100%{ transform: translateY(60px); opacity: 0; }
+}
+
+/* Fob lanyard sway */
+#fob { animation: fob-sway 2.5s ease-in-out infinite; transform-origin: 220px 70px; }
+@keyframes fob-sway {
+  0%,100%{ transform: rotate(-8deg); }
+  50%    { transform: rotate(8deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #gate, .pulse-ring, #postit, #fob { animation: none !important; }
+  #gate { transform: rotate(-75deg); }
+  #postit { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+<rect width="300" height="180" fill="#0e0e0e"/>
+<!-- Ground -->
+<rect x="0" y="150" width="300" height="30" fill="#1a1a1a"/>
+<line x1="0" y1="150" x2="300" y2="150" stroke="#333" stroke-width="1"/>
+
+<!-- Gate frame post -->
+<rect x="50" y="30" width="8" height="120" rx="2" fill="#d8d3c8"/>
+<!-- Gate bar -->
+<g id="gate">
+  <rect x="58" y="38" width="100" height="8" rx="2" fill="#d8d3c8"/>
+  <rect x="68" y="46" width="6" height="100" rx="1" fill="#d8d3c8" opacity=".5"/>
+  <rect x="90" y="46" width="6" height="100" rx="1" fill="#d8d3c8" opacity=".5"/>
+  <rect x="112" y="46" width="6" height="100" rx="1" fill="#d8d3c8" opacity=".5"/>
+  <rect x="134" y="46" width="6" height="100" rx="1" fill="#d8d3c8" opacity=".5"/>
+</g>
+
+<!-- Reader circle -->
+<circle cx="220" cy="100" r="14" fill="#1a1a1a" stroke="#d8d3c8" stroke-width="2"/>
+<text x="220" y="104" text-anchor="middle" font-family="monospace" font-size="8" fill="#666">READ</text>
+<!-- Pulse rings -->
+<circle class="pulse-ring" cx="220" cy="100" r="12" fill="none" stroke="#ff6a00" stroke-width="2"/>
+<circle class="pulse-ring" cx="220" cy="100" r="12" fill="none" stroke="#ff6a00" stroke-width="1.5"/>
+<circle class="pulse-ring" cx="220" cy="100" r="12" fill="none" stroke="#ff6a00" stroke-width="1"/>
+
+<!-- DS1990 fob on lanyard -->
+<g id="fob">
+  <line x1="220" y1="60" x2="220" y2="86" stroke="#888" stroke-width="2"/>
+  <circle cx="220" cy="60" r="6" fill="none" stroke="#888" stroke-width="1.5"/>
+  <circle cx="220" cy="86" r="8" fill="#333" stroke="#d8d3c8" stroke-width="2"/>
+  <circle cx="220" cy="86" r="4" fill="#d8d3c8" opacity=".4"/>
+</g>
+
+<!-- Post-it leak -->
+<g id="postit">
+  <rect x="10" y="105" width="140" height="42" rx="3" fill="#f5d94e" opacity=".95"/>
+  <text x="80" y="120" text-anchor="middle" font-family="monospace" font-size="7" fill="#111" font-weight="bold">Tech room key:</text>
+  <text x="80" y="133" text-anchor="middle" font-family="monospace" font-size="9" fill="#111">F1 5E C0 DE 00 17</text>
+  <text x="80" y="143" text-anchor="middle" font-family="monospace" font-size="6" fill="#555">(found on door post-it)</text>
+</g>
+</svg>

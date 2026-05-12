@@ -104,7 +104,11 @@ class Database:
                     # Coffee challenges (16-18)
                     (16, 'coffee', 'Technician Token', 'Read maintenance iButton', 10, 0, None),
                     (17, 'coffee', 'Crack & Dump', 'Dump badge via PM3 emulation', 10, 0, None),
-                    (18, 'coffee', 'Top Up Balance', 'Forge value block >=50 EUR', 10, 0, None)
+                    (18, 'coffee', 'Top Up Balance', 'Forge value block >=50 EUR', 10, 0, None),
+                    # Garage challenges (19-21)
+                    (19, 'garage', 'Rolling Code', 'RollJam garage remote', 10, 0, None),
+                    (20, 'garage', 'Pedestrian Gate', 'Clone iButton fob', 10, 0, None),
+                    (21, 'garage', 'Tech Room', 'Read MIFARE with leaked key', 10, 0, None),
                 ]
 
                 cursor.executemany("""
@@ -114,7 +118,7 @@ class Database:
 
                 self.conn.commit()
                 logger.info(f"Initialized {len(challenges)} challenges")
-            elif count < 18:
+            elif count < 21:
                 # Database exists but has fewer than 18 challenges - add missing ones
                 logger.info(f"Upgrading database from {count} to 18 challenges")
 
@@ -141,7 +145,10 @@ class Database:
                     (15, 'ir', 'Protocol Analysis', 'Identify IR protocol', 10, 0, None),
                     (16, 'coffee', 'Technician Token', 'Read maintenance iButton', 10, 0, None),
                     (17, 'coffee', 'Crack & Dump', 'Dump badge via PM3 emulation', 10, 0, None),
-                    (18, 'coffee', 'Top Up Balance', 'Forge value block >=50 EUR', 10, 0, None)
+                    (18, 'coffee', 'Top Up Balance', 'Forge value block >=50 EUR', 10, 0, None),
+                    (19, 'garage', 'Rolling Code', 'RollJam garage remote', 10, 0, None),
+                    (20, 'garage', 'Pedestrian Gate', 'Clone iButton fob', 10, 0, None),
+                    (21, 'garage', 'Tech Room', 'Read MIFARE with leaked key', 10, 0, None),
                 ]
 
                 # Add only missing challenges
@@ -155,7 +162,7 @@ class Database:
                     self.conn.commit()
                     logger.info(f"Added {len(missing_challenges)} new challenges")
             else:
-                logger.info(f"Database already contains {count} challenges (max: 18)")
+                logger.info(f"Database already contains {count} challenges (max: 21)")
 
         except Exception as e:
             logger.error(f"Failed to initialize database: {e}")

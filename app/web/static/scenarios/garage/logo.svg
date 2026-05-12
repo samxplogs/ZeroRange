@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" id="icon">
+  <!-- Side-on roll-up garage door, half open, with RF lightning bolt -->
+  <!-- Door frame -->
+  <rect x="8" y="4" width="48" height="52" rx="2" fill="none" stroke="#d8d3c8" stroke-width="2.5"/>
+  <!-- Door tracks (sides) -->
+  <line x1="8" y1="4" x2="8" y2="56" stroke="#d8d3c8" stroke-width="2"/>
+  <line x1="56" y1="4" x2="56" y2="56" stroke="#d8d3c8" stroke-width="2"/>
+  <!-- Door panels (top half — rolled up portion shown as stacked lines) -->
+  <rect x="10" y="5" width="44" height="6" rx="1" fill="#2a2a2a" stroke="#d8d3c8" stroke-width="1"/>
+  <rect x="10" y="12" width="44" height="6" rx="1" fill="#2a2a2a" stroke="#d8d3c8" stroke-width="1"/>
+  <rect x="10" y="19" width="44" height="6" rx="1" fill="#2a2a2a" stroke="#d8d3c8" stroke-width="1"/>
+  <!-- Opening gap (half open) -->
+  <rect x="10" y="26" width="44" height="28" rx="0" fill="#0e0e0e"/>
+  <!-- Ground line -->
+  <line x1="8" y1="56" x2="56" y2="56" stroke="#d8d3c8" stroke-width="2.5"/>
+  <!-- Lightning bolt (RF signal, orange accent) floating in gap -->
+  <polygon points="34,30 28,42 32,42 30,54 38,40 33,40" fill="#ff6a00"/>
+</svg>

@@ -32,6 +32,12 @@ _INDEX_TMPL = """<!DOCTYPE html>
     </svg>
     <h2>Coffee</h2>
   </a>
+  <a class="card" href="/scenarios/garage/">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+      <use href="/scenarios/garage/static/scenarios/garage/logo.svg#icon"/>
+    </svg>
+    <h2>Garage</h2>
+  </a>
 </div>
 </body>
 </html>"""

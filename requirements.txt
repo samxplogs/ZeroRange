@@ -11,5 +11,8 @@ evdev>=1.6.1
 Flask==3.0.0
 flask-cors==4.0.0
 
+# Optional: numpy for IQ-file OOK demodulation (Garage module, best-effort)
+# numpy>=1.24.0
+
 # Note: HackRF tools are system packages, not Python packages
 # Install with: sudo apt install hackrf libhackrf-dev rtl-433

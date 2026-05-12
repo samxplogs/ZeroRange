@@ -36,6 +36,7 @@ from flirc_handler import FlircHandler
 from ir_handler import IRHandler
 from database import Database
 from coffee_handler import CoffeeHandler
+from garage_handler import GarageHandler
 
 # Configure logging
 logging.basicConfig(
@@ -60,6 +61,7 @@ class State:
     SUBGHZ_MENU = "SUBGHZ_MENU"
     IR_MENU = "IR_MENU"
     COFFEE_MENU = "COFFEE_MENU"
+    GARAGE_MENU = "GARAGE_MENU"
     CHALLENGE_ACTIVE = "CHALLENGE_ACTIVE"
     SUCCESS_SCREEN = "SUCCESS_SCREEN"
     FAIL_SCREEN = "FAIL_SCREEN"
@@ -84,14 +86,15 @@ class ZeroRange:
         self.flirc: Optional[FlircHandler] = None
         self.ir: Optional[IRHandler] = None
         self.coffee: Optional[CoffeeHandler] = None
+        self.garage: Optional[GarageHandler] = None
         self.db: Optional[Database] = None
 
         self.current_state = State.HOME_SCREEN
         self.current_score = 0
 
         # Menu navigation
-        self.selected_menu_item = 0  # 0=iButton, 1=NFC, 2=RFID, 3=SubGHZ, 4=IR, 5=Coffee, 6=Settings
-        self.menu_items = ["iButton", "NFC", "RFID", "SubGHZ", "IR", "Coffee", "Settings"]
+        self.selected_menu_item = 0  # 0=iButton, 1=NFC, 2=RFID, 3=SubGHZ, 4=IR, 5=Coffee, 6=Garage, 7=Settings
+        self.menu_items = ["iButton", "NFC", "RFID", "SubGHZ", "IR", "Coffee", "Garage", "Settings"]
 
         # Sub-menu navigation (challenges 0-2)
         self.selected_ibutton_challenge = 0
@@ -199,6 +202,24 @@ class ZeroRange:
                 logger.warning(f"Coffee handler initialization failed: {e}")
                 self.coffee = None
 
+            # Initialize Garage handler (always available, hardware checked per-stage)
+            logger.info("Initializing Garage handler...")
+            try:
+                from app.web.routes.garage import emit_event as _garage_sse
+            except ImportError:
+                _garage_sse = None
+            try:
+                self.garage = GarageHandler(
+                    self.lcd, self.db,
+                    proxmark=self.proxmark,
+                    hackrf=self.hackrf,
+                    sse_emit=_garage_sse,
+                )
+                logger.info("Garage handler initialized")
+            except Exception as e:
+                logger.warning(f"Garage handler initialization failed: {e}")
+                self.garage = None
+
             self.lcd.clear()
             self.lcd.write_line(0, "ZeroRange v1.0")
             self.lcd.write_line(1, "Ready!          ")  # Pad with spaces to clear
@@ -278,7 +299,10 @@ class ZeroRange:
             elif self.selected_menu_item == 5:  # Coffee
                 logger.info("Entering Coffee menu")
                 self.current_state = State.COFFEE_MENU
-            elif self.selected_menu_item == 6:  # Settings
+            elif self.selected_menu_item == 6:  # Garage
+                logger.info("Entering Garage menu")
+                self.current_state = State.GARAGE_MENU
+            elif self.selected_menu_item == 7:  # Settings
                 logger.info("Entering settings")
                 self.current_state = State.SETTINGS
 
@@ -499,6 +523,45 @@ class ZeroRange:
         except Exception as e:
             logger.error(f"Error in Coffee module: {e}", exc_info=True)
         self.current_state = State.COFFEE_MENU
+
+    def display_garage_menu(self):
+        """Display Garage module entry screen"""
+        self.lcd.clear()
+        if self.garage is None:
+            self.lcd.write_line(0, "Garage N/A")
+            self.lcd.write_line(1, "L=Back")
+            return
+        score = self.garage.get_module_score()
+        self.lcd.write_line(0, f"Garage  {score}/30")
+        self.lcd.write_line(1, "SEL=Start L=Back")
+
+    def handle_garage_menu(self):
+        """Handle Garage module entry / launch"""
+        if self.garage is None:
+            if self.lcd.button_pressed(5):
+                self.lcd.wait_button_release(5)
+                self.current_state = State.MAIN_MENU
+            return
+
+        if self.lcd.button_pressed(1):
+            self.lcd.wait_button_release(1)
+            logger.info("Starting Garage module")
+            self.run_garage()
+        elif self.lcd.button_pressed(5):
+            self.lcd.wait_button_release(5)
+            logger.info("Returning to main menu from Garage")
+            self.current_state = State.MAIN_MENU
+
+    def run_garage(self):
+        """Run the Garage module (all stages, internal menu)."""
+        try:
+            pts = self.garage.run()
+            if pts > 0:
+                self.current_score = self.db.get_total_score()
+                logger.info(f"Garage module earned {pts} pts. Total: {self.current_score}")
+        except Exception as e:
+            logger.error(f"Error in Garage module: {e}", exc_info=True)
+        self.current_state = State.GARAGE_MENU
 
     def display_settings(self):
         """Display settings menu"""
@@ -964,6 +1027,12 @@ class ZeroRange:
                         self.handle_coffee_menu()
                         time.sleep(0.1)
 
+                elif self.current_state == State.GARAGE_MENU:
+                    self.display_garage_menu()
+                    while self.current_state == State.GARAGE_MENU:
+                        self.handle_garage_menu()
+                        time.sleep(0.1)
+
                 elif self.current_state == State.SETTINGS:
                     self.display_settings()
                     while self.current_state == State.SETTINGS:
@@ -997,6 +1066,9 @@ class ZeroRange:
 
             if self.coffee:
                 self.coffee.close()
+
+            if self.garage:
+                self.garage.close()
 
             if self.subghz:
                 self.subghz.close()
